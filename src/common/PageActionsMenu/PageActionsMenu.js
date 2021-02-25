@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import { Button } from '../Button/Button.js'
 
 const PageActionsMenu = ({
   createJob,
@@ -23,12 +24,11 @@ const PageActionsMenu = ({
       )}
       {registerDialog && (
         <div data-testid="actions-button" className="page-actions-container">
-          <button
-            className="btn_secondary btn_small btn_register"
+          <Button
+            label={registerDialogHeader}
             onClick={onClick}
-          >
-            {registerDialogHeader}
-          </button>
+            classList="btn_register"
+          />
         </div>
       )}
     </>

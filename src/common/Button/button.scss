@@ -1,0 +1,179 @@
+@import '../../scss/variables';
+@import '../../scss/colors';
+@import '../../scss/borders';
+
+[class^="btn"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  height: 36px;
+  color: $white;
+  font-weight: 500;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-style: normal;
+  line-height: 16px;
+  border: 0;
+  border-radius: $mainBorderRadius;
+
+  svg {
+    margin-right: 5px;
+
+    path {
+      fill: $white;
+    }
+  }
+}
+
+.btn {
+  &-primary {
+    background: $brightTurquoise;
+
+    &:focus {
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:hover {
+      background: $java;
+    }
+
+    &:active {
+      background: $mountainMeadow;
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:disabled {
+      color: $spunPearl;
+      background: $white;
+      border: 1px solid $brightTurquoise;
+      cursor: not-allowed;
+
+      .eye-svg_color {
+        fill: $topaz;
+      }
+    }
+  }
+
+  &-tertiary {
+    color: $primary;
+    background: $white;
+    border: $primaryBorder;
+
+    svg {
+      path {
+        fill: $primary;
+      }
+    }
+
+    &:focus {
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:hover {
+      background: $alabaster;
+    }
+
+    &:active {
+      background: $mercury;
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:disabled {
+      color: $spunPearl;
+      background: $white;
+      border: $primaryBorder;
+      cursor: not-allowed;
+
+      svg {
+        path {
+          fill: $primary;
+        }
+      }
+    }
+  }
+
+  &-secondary {
+    background: $malibu;
+
+    &:focus {
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:hover {
+      background: $cornflowerBlue;
+    }
+
+    &:active {
+      background: $indigo;
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:disabled {
+      color: $spunPearl;
+      background: $white;
+      border: 1px solid $malibu;
+      cursor: not-allowed;
+
+      svg {
+        path {
+          fill: $primary;
+        }
+      }
+    }
+  }
+
+  &-danger {
+    color: $white;
+    background: $amaranth;
+
+    &:focus {
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:hover {
+      background: $ceriseRed;
+    }
+
+    &:active {
+      background: $maroonFlash;
+      border: 1px solid rgba($black, 0.4);
+    }
+
+    &:disabled {
+      color: $spunPearl;
+      background: $white;
+      border: 1px solid $amaranth;
+      cursor: not-allowed;
+
+      svg {
+        path {
+          fill: $primary;
+        }
+      }
+    }
+  }
+
+  &-label {
+    color: $primary;
+    background: $white;
+    border: 0;
+
+    &:focus {
+      border: $dividerBorder;
+    }
+
+    &:hover {
+      color: $topaz;
+    }
+
+    &:active {
+      color: $black;
+    }
+
+    &:disabled {
+      color: $spunPearl;
+      cursor: not-allowed;
+    }
+  }
+}

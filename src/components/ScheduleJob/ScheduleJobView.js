@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 
 import ScheduleJobSimple from '../ScheduleJobSimple/ScheduleJobSimple'
 import ScheduleCron from '../ScheduleCron/ScheduleCron'
+import { Button } from '../../common/Button/Button.js'
 
 import { ReactComponent as Schedule } from '../../images/clock.svg'
 
@@ -29,18 +29,13 @@ const ScheduleJobView = ({
   setTime,
   time
 }) => {
-  const scheduleBtnClassNames = classnames(
-    'btn_primary',
-    'btn_small',
-    'btn__schedule'
-  )
-
   return (
     <div className="schedule_container">
       <div className="schedule_tabs">
         {tabs.map(tab => (
           <div
-            className={`schedule_tabs_item ${activeTab === tab.id && 'active'}`}
+            className={`schedule_tabs_item ${activeTab === tab.id &&
+              'schedule_tabs_item_active'}`}
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
           >
@@ -78,10 +73,17 @@ const ScheduleJobView = ({
           />
         )}
       </div>
-      <button className={scheduleBtnClassNames} onClick={onSchedule}>
-        <Schedule />
-        Schedule
-      </button>
+      <Button
+        type="secondary"
+        label={
+          <>
+            <Schedule />
+            <span>Schedule </span>
+          </>
+        }
+        onClick={onSchedule}
+        classList="btn__schedule"
+      />
     </div>
   )
 }
