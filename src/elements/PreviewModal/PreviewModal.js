@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import prettyBytes from 'pretty-bytes'
 import PropTypes from 'prop-types'
@@ -9,13 +9,23 @@ import Download from '../../common/Download/Download'
 
 import artifactActions from '../../actions/artifacts'
 import { formatDatetime } from '../../utils'
+import { getArtifactPreview } from '../../utils/getArtifactPreview'
 
 import { ReactComponent as Close } from '../../images/close.svg'
 
 import './previewModal.scss'
 
 const PreviewModal = ({ item }) => {
+  const [preview, setPreview] = useState([])
+  const [noData, setNoData] = useState(false)
+
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (preview.length === 0) {
+      getArtifactPreview(item, noData, setNoData, setPreview)
+    }
+  }, [item, noData, preview.length])
 
   return ReactDOM.createPortal(
     <div className="item-artifacts__modal-preview">
@@ -25,7 +35,9 @@ const PreviewModal = ({ item }) => {
             {item.db_key || item.key}
           </div>
           <div className="item-data item-data__path">
-            {item.target_path?.path}
+            {`${
+              item.target_path?.schema ? `${item.target_path?.schema}://` : ''
+            }${item.target_path?.path}`}
           </div>
           {item.size && (
             <div className="item-data">
@@ -40,8 +52,9 @@ const PreviewModal = ({ item }) => {
           </div>
           <div className="preview-body__download">
             <Download
-              fileName={item.db_key || item.key}
-              path={item.target_path?.path}
+              path={`${item.target_path?.path}${
+                item.model_file ? item.model_file : ''
+              }`}
               schema={item.target_path?.schema}
               user={item.user ?? item.producer?.owner}
             />
@@ -61,7 +74,7 @@ const PreviewModal = ({ item }) => {
           </div>
         </div>
         <div className="item-artifacts__preview">
-          <ArtifactsPreview artifact={item} />
+          <ArtifactsPreview noData={noData} preview={preview} />
         </div>
       </div>
     </div>,

@@ -236,16 +236,6 @@
   }
 
   .btn {
-    &_primary {
-      svg {
-        margin-right: 5px;
-
-        path {
-          fill: $white;
-        }
-      }
-    }
-
     &__schedule {
       margin-top: 16px;
       margin-left: auto;

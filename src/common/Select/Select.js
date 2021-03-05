@@ -136,9 +136,8 @@ const Select = ({
               }}
             />
             <Button
-              type="danger"
+              type={selectedItemAction.btnConfirmType}
               label={selectedItemAction.confirm.btnConfirmLabel}
-              classList={selectedItemAction.confirm.btnConfirmClassNames}
               onClick={() => {
                 selectedItemAction.handler(selectedId)
                 setConfirmDialogOpen(false)

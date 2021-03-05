@@ -75,7 +75,7 @@ const Jobs = ({
       title: `Delete scheduled job "${scheduledJob.name}"?`,
       description: 'Deleted scheduled jobs can not be restored.',
       btnConfirmLabel: 'Delete',
-      btnConfirmClassNames: 'btn_danger',
+      btnConfirmType: 'danger',
       rejectHandler: () => {
         setConfirmData(null)
       },
@@ -223,9 +223,8 @@ const Jobs = ({
               classList="pop-up-dialog__btn_cancel"
             />
             <Button
-              type="danger"
+              type={confirmData.btnConfirmType}
               label={confirmData.btnConfirmLabel}
-              classList={confirmData.btnConfirmClassNames}
               onClick={() => confirmData.confirmHandler(confirmData.item)}
             />
           </div>

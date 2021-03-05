@@ -4,7 +4,6 @@
   "private": true,
   "homepage": "/mlrun",
   "dependencies": {
-    "@storybook/preset-scss": "^1.0.3",
     "axios": "^0.21.1",
     "camelcase": "^5.2.0",
     "classnames": "^2.2.6",
@@ -69,6 +68,7 @@
     "@storybook/addon-essentials": "^6.1.20",
     "@storybook/addon-links": "^6.1.20",
     "@storybook/react": "^6.1.20",
+    "@storybook/preset-scss": "^1.0.3",
     "@svgr/webpack": "^5.4.0",
     "@testing-library/react": "^11.0.2",
     "@typescript-eslint/eslint-plugin": "^2.2.0",

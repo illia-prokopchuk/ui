@@ -85,7 +85,7 @@ const ProjectsView = ({
             />
             <Button
               label={confirmData.btnConfirmLabel}
-              type="danger"
+              type={confirmData.btnConfirmType}
               onClick={() => confirmData.confirmHandler(confirmData.item)}
             />
           </div>
