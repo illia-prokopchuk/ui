@@ -90,7 +90,15 @@ const ArtifactsTableRow = ({
                   selectedItem={selectedItem}
                   expandLink={index === 0}
                   firstRow={index === 0}
-                  link={data.rowExpanded?.link ? data.link && data.link : false}
+                  link={
+                    data.rowExpanded?.link
+                      ? `${data.link.slice(0, data.link.lastIndexOf('/'))}/${
+                          match.params.tab
+                            ? match.params.tab
+                            : artifactsData.detailsMenu[0]
+                        }`
+                      : false
+                  }
                   selectedRowId={selectedRowId}
                   setSelectedRowId={setSelectedRowId}
                   withCheckbox={withCheckbox}
@@ -144,20 +152,16 @@ const ArtifactsTableRow = ({
                           }
                           item={currentItem}
                           link={
-                            value.link &&
-                            (value.link === 'overview'
-                              ? `/projects/${
-                                  match.params.projectName
-                                }/${pageData.page.toLowerCase()}${
-                                  match.params.pageTab
-                                    ? `/${match.params.pageTab}`
-                                    : ''
-                                }/${rowItem.key.value}/${
+                            value.link
+                              ? `${value.link.slice(
+                                  0,
+                                  value.link.lastIndexOf('/')
+                                )}/${
                                   match.params.tab
                                     ? match.params.tab
-                                    : `${artifactsData.detailsMenu[0]}`
+                                    : artifactsData.detailsMenu[0]
                                 }`
-                              : value.link)
+                              : ''
                           }
                           match={match}
                           key={value.value + i ?? Date.now()}
@@ -190,17 +194,13 @@ const ArtifactsTableRow = ({
                   item={content[index]}
                   key={Math.random() + i}
                   link={
-                    value.link === 'overview'
-                      ? `/projects/${
-                          match.params.projectName
-                        }/${pageData.page.toLowerCase()}${
-                          match.params.pageTab ? `/${match.params.pageTab}` : ''
-                        }/${rowItem.key.value}/${
+                    value.link
+                      ? `${value.link.slice(0, value.link.lastIndexOf('/'))}/${
                           match.params.tab
                             ? match.params.tab
-                            : `${artifactsData.detailsMenu[0]}`
+                            : artifactsData.detailsMenu[0]
                         }`
-                      : value.link
+                      : ''
                   }
                   match={match}
                   selectedItem={selectedItem}
