@@ -2,6 +2,7 @@ import { formatDatetime } from './datetime'
 import measureTime from './measureTime'
 import cronstrue from 'cronstrue'
 import { parseKeyValues } from './object'
+import { generateLinkToDetailsPanel } from './generateLinkToDetailsPanel'
 
 const createJobsContent = (content, groupedByWorkflow, scheduled) => {
   return content.map(contentItem => {
@@ -9,9 +10,6 @@ const createJobsContent = (content, groupedByWorkflow, scheduled) => {
       if (scheduled) {
         const [, , scheduleJobFunctionUid] =
           contentItem.func?.match(/\w(?<!\d)[\w'-]*/g, '') || []
-        const nameLink = !contentItem.func?.includes('hub:')
-          ? `/projects/${contentItem.project}/functions/${scheduleJobFunctionUid}/overview`
-          : null
         const [, projectName, jobUid] =
           contentItem.lastRunUri?.match(/(.+)@(.+)#([^:]+)(?::(.+))?/) || []
         const lastRunLink =
@@ -23,7 +21,15 @@ const createJobsContent = (content, groupedByWorkflow, scheduled) => {
           name: {
             value: contentItem.name,
             class: 'jobs_big',
-            link: nameLink
+            link: tab =>
+              generateLinkToDetailsPanel(
+                contentItem.project,
+                'functions',
+                null,
+                scheduleJobFunctionUid,
+                null,
+                tab
+              )
           },
           type: {
             value: contentItem.type,
@@ -72,7 +78,15 @@ const createJobsContent = (content, groupedByWorkflow, scheduled) => {
           name: {
             value: contentItem.name,
             class: 'jobs_medium',
-            link: `/projects/${contentItem.project}/jobs/monitor/${contentItem.uid}/overview`
+            link: tab =>
+              generateLinkToDetailsPanel(
+                contentItem.project,
+                'jobs',
+                'monitor',
+                contentItem.uid,
+                null,
+                tab
+              )
           },
           type: {
             value: typeof groupedByWorkflow !== 'boolean' ? 'workflow' : type,

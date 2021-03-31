@@ -7,7 +7,6 @@ import TableActionsMenu from '../../common/TableActionsMenu/TableActionsMenu'
 import Loader from '../../common/Loader/Loader'
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage'
 
-import artifactsData from '../../components/Artifacts/artifactsData'
 import { FEATURES_TAB, MODEL_ENDPOINTS_TAB } from '../../constants'
 
 const ArtifactsTableRow = ({
@@ -90,7 +89,11 @@ const ArtifactsTableRow = ({
                   selectedItem={selectedItem}
                   expandLink={index === 0}
                   firstRow={index === 0}
-                  link={data.rowExpanded?.link ? data.link && data.link : false}
+                  link={
+                    data.rowExpanded?.link
+                      ? data.rowExpanded.link(match.params.tab ?? 'overview')
+                      : false
+                  }
                   selectedRowId={selectedRowId}
                   setSelectedRowId={setSelectedRowId}
                   withCheckbox={withCheckbox}
@@ -144,20 +147,9 @@ const ArtifactsTableRow = ({
                           }
                           item={currentItem}
                           link={
-                            value.link &&
-                            (value.link === 'overview'
-                              ? `/projects/${
-                                  match.params.projectName
-                                }/${pageData.page.toLowerCase()}${
-                                  match.params.pageTab
-                                    ? `/${match.params.pageTab}`
-                                    : ''
-                                }/${rowItem.key.value}/${
-                                  match.params.tab
-                                    ? match.params.tab
-                                    : `${artifactsData.detailsMenu[0]}`
-                                }`
-                              : value.link)
+                            value.link
+                              ? value.link(match.params.tab ?? 'overview')
+                              : ''
                           }
                           match={match}
                           key={value.value + i ?? Date.now()}
@@ -190,17 +182,7 @@ const ArtifactsTableRow = ({
                   item={content[index]}
                   key={Math.random() + i}
                   link={
-                    value.link === 'overview'
-                      ? `/projects/${
-                          match.params.projectName
-                        }/${pageData.page.toLowerCase()}${
-                          match.params.pageTab ? `/${match.params.pageTab}` : ''
-                        }/${rowItem.key.value}/${
-                          match.params.tab
-                            ? match.params.tab
-                            : `${artifactsData.detailsMenu[0]}`
-                        }`
-                      : value.link
+                    value.link ? value.link(match.params.tab ?? 'overview') : ''
                   }
                   match={match}
                   selectedItem={selectedItem}

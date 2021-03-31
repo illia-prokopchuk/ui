@@ -6,7 +6,6 @@ import classnames from 'classnames'
 import TableCell from '../TableCell/TableCell'
 import TableActionsMenu from '../../common/TableActionsMenu/TableActionsMenu'
 
-import { detailsMenu } from '../../components/JobsPage/jobsData'
 import { MONITOR_TAB } from '../../constants'
 
 const JobsTableRow = ({
@@ -113,14 +112,11 @@ const JobsTableRow = ({
                         }
                         item={groupCurrentItem}
                         link={
-                          index === 0 &&
-                          `/projects/${match.params.projectName}/jobs/${
-                            match.params.pageTab
-                          }/${groupCurrentItem.uid}${
-                            match.params.tab
-                              ? `/${match.params.tab}`
-                              : `/${detailsMenu[0]}`
-                          }`
+                          cellContentObj.link
+                            ? cellContentObj.link(
+                                match.params.tab ?? 'overview'
+                              )
+                            : ''
                         }
                         key={`${cellContentObj.value}${index}`}
                         selectItem={handleSelectItem}
@@ -150,7 +146,11 @@ const JobsTableRow = ({
                 isGroupedByWorkflow={isGroupedByWorkflow}
                 item={currentItem}
                 key={`${new Date().getTime()}${index}`}
-                link={rowItemProp.link}
+                link={
+                  rowItemProp.link
+                    ? rowItemProp.link(match.params.tab ?? 'overview')
+                    : ''
+                }
                 selectItem={handleSelectItem}
                 selectedItem={selectedItem}
               />
