@@ -5,8 +5,8 @@ import classnames from 'classnames'
 
 import TableCell from '../TableCell/TableCell'
 import TableActionsMenu from '../../common/TableActionsMenu/TableActionsMenu'
+import artifactsData from '../../components/Artifacts/artifactsData.json'
 
-import { detailsMenu } from '../../components/JobsPage/jobsData'
 import { MONITOR_TAB } from '../../constants'
 
 const JobsTableRow = ({
@@ -113,14 +113,16 @@ const JobsTableRow = ({
                         }
                         item={groupCurrentItem}
                         link={
-                          index === 0 &&
-                          `/projects/${match.params.projectName}/jobs/${
-                            match.params.pageTab
-                          }/${groupCurrentItem.uid}${
-                            match.params.tab
-                              ? `/${match.params.tab}`
-                              : `/${detailsMenu[0]}`
-                          }`
+                          index === 0 && match.params.pageTab === 'monitor'
+                            ? `${cellContentObj.link.slice(
+                                0,
+                                cellContentObj.link.lastIndexOf('/')
+                              )}/${
+                                match.params.tab
+                                  ? match.params.tab
+                                  : artifactsData.detailsMenu[0]
+                              }`
+                            : cellContentObj.link
                         }
                         key={`${cellContentObj.value}${index}`}
                         selectItem={handleSelectItem}
@@ -150,7 +152,18 @@ const JobsTableRow = ({
                 isGroupedByWorkflow={isGroupedByWorkflow}
                 item={currentItem}
                 key={`${new Date().getTime()}${index}`}
-                link={rowItemProp.link}
+                link={
+                  index === 0 && match.params.pageTab === 'monitor'
+                    ? `${rowItemProp.link.slice(
+                        0,
+                        rowItemProp.link.lastIndexOf('/')
+                      )}/${
+                        match.params.tab
+                          ? match.params.tab
+                          : artifactsData.detailsMenu[0]
+                      }`
+                    : rowItemProp.link
+                }
                 selectItem={handleSelectItem}
                 selectedItem={selectedItem}
               />
