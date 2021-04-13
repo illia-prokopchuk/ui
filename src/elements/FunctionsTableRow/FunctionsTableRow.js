@@ -39,6 +39,10 @@ const FunctionsTableRow = ({
     parent.current?.classList.value.includes('parent-row-expanded') &&
       'parent-row-expanded'
   )
+  const editedActionMenu =
+    content[index].state === 'failed' || content[index].state === 'error'
+      ? actionsMenu.filter(action => action.label !== 'Run')
+      : actionsMenu
 
   return (
     <div className={rowClassNames} ref={parent}>
@@ -147,7 +151,7 @@ const FunctionsTableRow = ({
             )
           })}
           <div className="table-body__cell action_cell">
-            <ActionsMenu dataItem={content[index]} menu={actionsMenu} />
+            <ActionsMenu dataItem={content[index]} menu={editedActionMenu} />
           </div>
         </>
       )}
