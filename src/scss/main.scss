@@ -503,6 +503,14 @@ iframe {
 
     &-text {
       font-size: 15px;
+
+      &__with-icon {
+        display: flex;
+
+        svg {
+          margin-right: 5px;
+        }
+      }
     }
 
     &-step-title {
