@@ -223,7 +223,7 @@ const DeployModelPopUp = ({ isOpen, model, onResolve }) => {
           return (
             <Modal
               actions={getModalActions(formState)}
-              className="deploy-model"
+              className="deploy-model2"
               location={location}
               onClose={handleCloseModal}
               show={isOpen}
