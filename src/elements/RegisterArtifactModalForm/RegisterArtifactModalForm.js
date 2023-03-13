@@ -66,7 +66,7 @@ const RegisterArtifactModalForm = ({
             <span>{messageByKind}</span>
             <div>
               <p>
-                All you need to do is enter the name of the artifact and the URL (e.g.
+                All you need to do is enter the name of the dataset and the URL (e.g.
                 s3://my-bucket/path).
               </p>
               <a
@@ -88,7 +88,7 @@ const RegisterArtifactModalForm = ({
             label="Name"
             name="metadata.key"
             required
-            tip="Artifact names in the same project must be unique"
+            tip="Dataset names in the same project must be unique"
             validationRules={getValidationRules('artifact.name', {
               name: 'ArtifactExists',
               label: 'Artifact name should be unique',

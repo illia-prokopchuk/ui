@@ -61,7 +61,7 @@ const RegisterArtifactForm = ({
           <p>{messageByKind}</p>
           <div>
             <p>
-              All you need to do is enter the name of the artifact and the URL (e.g.
+              All you need to do is enter the name of the dataset and the URL (e.g.
               s3://my-bucket/path).
             </p>
             <a
@@ -86,7 +86,7 @@ const RegisterArtifactForm = ({
         required
         requiredText="This field is required"
         setInvalid={value => setValidation(state => ({ ...state, isNameValid: value }))}
-        tip="Artifact names in the same project must be unique"
+        tip="Dataset names in the same project must be unique"
         type="text"
         validationRules={getValidationRules('artifact.name')}
         value={key}
