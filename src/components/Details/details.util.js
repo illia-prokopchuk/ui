@@ -50,7 +50,6 @@ export const generateArtifactsContent = (detailsType, selectedItem, projectName)
       },
       function_uri: {
         value: selectedItem?.spec?.function_uri,
-        //remove 'latest' when function_uri will contain hash or tag
         link: selectedItem?.spec?.function_uri
           ? `${generateLinkPath(`store://functions/${selectedItem.spec.function_uri}`)}${
               selectedItem.spec.function_uri.includes(':') ? '' : '/latest'
@@ -63,7 +62,7 @@ export const generateArtifactsContent = (detailsType, selectedItem, projectName)
       monitoring_feature_set_uri: {
         value: selectedItem?.status?.monitoring_feature_set_uri,
         link: selectedItem?.status?.monitoring_feature_set_uri
-          ? `${generateLinkPath(selectedItem?.status?.monitoring_feature_set_uri)}/latest/overview`
+          ? `${generateLinkPath(selectedItem?.status?.monitoring_feature_set_uri)}/overview`
           : ''
       },
       last_prediction: {
