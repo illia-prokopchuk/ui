@@ -21,6 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import { find, isEmpty } from 'lodash'
+import axios from 'axios'
 
 import FilterMenu from '../../FilterMenu/FilterMenu'
 import JobWizard from '../../JobWizard/JobWizard'
@@ -37,6 +38,7 @@ import {
   MONITOR_JOBS_TAB,
   MONITOR_WORKFLOWS_TAB,
   PANEL_RERUN_MODE,
+  REQUEST_CANCELED,
   WORKFLOW_GRAPH_VIEW
 } from '../../../constants'
 import {
@@ -57,6 +59,8 @@ import { isWorkflowStepExecutable } from '../../Workflow/workflow.util'
 import { openPopUp } from 'igz-controls/utils/common.util'
 import { parseFunction } from '../../../utils/parseFunction'
 import { parseJob } from '../../../utils/parseJob'
+import { showLargeResponsePopUp } from '../../../utils/showLargeResponsePopUp'
+import { cancelRequest } from '../../../utils/cancelRequest'
 import { setFilters } from '../../../reducers/filtersReducer'
 import { setNotification } from '../../../reducers/notificationReducer'
 import { useMode } from '../../../hooks/mode.hook'
@@ -82,6 +86,7 @@ const MonitorWorkflows = ({
   const [dataIsLoaded, setDataIsLoaded] = useState(false)
   const [itemIsSelected, setItemIsSelected] = useState(false)
   const [selectedJob, setSelectedJob] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const [convertedYaml, toggleConvertedYaml] = useYaml('')
   const appStore = useSelector(store => store.appStore)
   const workflowsStore = useSelector(state => state.workflowsStore)
@@ -91,6 +96,7 @@ const MonitorWorkflows = ({
   const location = useLocation()
   const dispatch = useDispatch()
   const { isStagingMode } = useMode()
+  const fetchWokflowsRef = useRef({ current: {} })
   const {
     editableItem,
     handleMonitoring,
@@ -298,7 +304,30 @@ const MonitorWorkflows = ({
 
   const getWorkflows = useCallback(
     filter => {
-      fetchWorkflows(params.projectName, filter)
+      const cancelJobsRequestTimeout = setTimeout(() => {
+        cancelRequest(fetchWokflowsRef, REQUEST_CANCELED)
+      }, 30000)
+
+      fetchWorkflows(
+        params.projectName,
+        filter,
+        new axios.CancelToken(cancel => {
+          fetchWokflowsRef.current.cancel = cancel
+        })
+      )
+        .then(response => {
+          if (response.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+          } else {
+            setLargeRequestErrorMessage('')
+          }
+        })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+          }
+        })
+        .finally(() => clearTimeout(cancelJobsRequestTimeout))
     },
     [fetchWorkflows, params.projectName]
   )
@@ -511,10 +540,14 @@ const MonitorWorkflows = ({
           </div>
         </div>
       )}
-      {workflowsStore.workflows.loading ? null : !params.workflowId &&
-        workflowsStore.workflows.data.length === 0 ? (
+      {workflowsStore.workflows.loading ? null : (!params.workflowId &&
+          workflowsStore.workflows.data.length === 0) ||
+        largeRequestErrorMessage ? (
         <NoData
-          message={getNoDataMessage(filtersStore, filters, JOBS_PAGE, MONITOR_WORKFLOWS_TAB)}
+          message={
+            largeRequestErrorMessage ||
+            getNoDataMessage(filtersStore, filters, JOBS_PAGE, MONITOR_WORKFLOWS_TAB)
+          }
         />
       ) : (
         <>

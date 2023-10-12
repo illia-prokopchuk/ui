@@ -20,13 +20,20 @@ such restriction.
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios'
 
 import RealTimePipelinesView from './RealTimePipelinesView'
 
-import { GROUP_BY_NAME, MODELS_PAGE, REAL_TIME_PIPELINES_TAB } from '../../../constants'
+import {
+  GROUP_BY_NAME,
+  MODELS_PAGE,
+  REAL_TIME_PIPELINES_TAB,
+  REQUEST_CANCELED
+} from '../../../constants'
 import { fetchArtifactsFunctions, removePipelines } from '../../../reducers/artifactsReducer'
 import createFunctionsContent from '../../../utils/createFunctionsContent'
 import { cancelRequest } from '../../../utils/cancelRequest'
+import { showLargeResponsePopUp } from '../../../utils/showLargeResponsePopUp'
 import { generatePageData } from './realTimePipelines.util'
 import { getFunctionIdentifier } from '../../../utils/getUniqueIdentifier'
 import { setFilters } from '../../../reducers/filtersReducer'
@@ -38,6 +45,7 @@ import { ReactComponent as Yaml } from 'igz-controls/images/yaml.svg'
 const RealTimePipelines = () => {
   const [pipelines, setPipelines] = useState([])
   const [selectedRowData, setSelectedRowData] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const artifactsStore = useSelector(store => store.artifactsStore)
   const filtersStore = useSelector(store => store.filtersStore)
   const params = useParams()
@@ -60,16 +68,38 @@ const RealTimePipelines = () => {
 
   const fetchData = useCallback(
     filters => {
-      dispatch(fetchArtifactsFunctions({ project: params.projectName, filters }))
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(pipelinesRef, REQUEST_CANCELED)
+      }, 30000)
+      const config = {
+        cancelToken: new axios.CancelToken(cancel => {
+          pipelinesRef.current.cancel = cancel
+        })
+      }
+
+      dispatch(fetchArtifactsFunctions({ project: params.projectName, filters, config }))
         .unwrap()
         .then(result => {
-          setPipelines(
-            result.filter(
-              func =>
-                !Object.keys(func.labels).some(labelKey => labelKey.includes('parent-function'))
+          if (result.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setPipelines([])
+          } else {
+            setPipelines(
+              result.filter(
+                func =>
+                  !Object.keys(func.labels).some(labelKey => labelKey.includes('parent-function'))
+              )
             )
-          )
+            setLargeRequestErrorMessage('')
+          }
         })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setPipelines([])
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [dispatch, params.projectName]
   )
@@ -164,9 +194,11 @@ const RealTimePipelines = () => {
       filtersStore={filtersStore}
       handleExpandAll={handleExpandAll}
       handleExpandRow={handleExpandRow}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       pageData={pageData}
       params={params}
       pipelines={pipelines}
+      ref={pipelinesRef}
       selectedRowData={selectedRowData}
       tableContent={tableContent}
     />

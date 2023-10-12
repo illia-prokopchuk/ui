@@ -52,6 +52,7 @@ const DatasetsView = React.forwardRef(
       filtersStore,
       handleExpandRow,
       handleRefresh,
+      largeRequestErrorMessage,
       pageData,
       selectedDataset,
       selectedRowData,
@@ -101,13 +102,10 @@ const DatasetsView = React.forwardRef(
               </div>
               {artifactsStore.loading ? null : datasets.length === 0 ? (
                 <NoData
-                  message={getNoDataMessage(
-                    filtersStore,
-                    filters,
-                    DATASETS_PAGE,
-                    null,
-                    DATASETS_FILTERS
-                  )}
+                  message={
+                    largeRequestErrorMessage ||
+                    getNoDataMessage(filtersStore, filters, DATASETS_PAGE, null, DATASETS_FILTERS)
+                  }
                 />
               ) : (
                 <>
@@ -181,6 +179,7 @@ DatasetsView.propTypes = {
   filtersStore: PropTypes.object.isRequired,
   handleExpandRow: PropTypes.func.isRequired,
   handleRefresh: PropTypes.func.isRequired,
+  largeRequestErrorMessage: PropTypes.string.isRequired,
   pageData: PropTypes.object.isRequired,
   selectedDataset: PropTypes.object.isRequired,
   selectedRowData: PropTypes.object.isRequired,

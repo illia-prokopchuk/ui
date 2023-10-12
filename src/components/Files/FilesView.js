@@ -52,6 +52,7 @@ const FilesView = React.forwardRef(
       filtersStore,
       handleExpandRow,
       handleRefresh,
+      largeRequestErrorMessage,
       pageData,
       selectedFile,
       selectedRowData,
@@ -101,7 +102,10 @@ const FilesView = React.forwardRef(
               </div>
               {artifactsStore.loading ? null : files.length === 0 ? (
                 <NoData
-                  message={getNoDataMessage(filtersStore, filters, FILES_PAGE, null, FILES_FILTERS)}
+                  message={
+                    largeRequestErrorMessage ||
+                    getNoDataMessage(filtersStore, filters, FILES_PAGE, null, FILES_FILTERS)
+                  }
                 />
               ) : (
                 <>
@@ -175,6 +179,7 @@ FilesView.propTypes = {
   filtersStore: PropTypes.object.isRequired,
   handleExpandRow: PropTypes.func.isRequired,
   handleRefresh: PropTypes.func.isRequired,
+  largeRequestErrorMessage: PropTypes.string.isRequired,
   pageData: PropTypes.object.isRequired,
   selectedFile: PropTypes.object.isRequired,
   selectedRowData: PropTypes.object.isRequired,

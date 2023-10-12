@@ -21,11 +21,12 @@ import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { isEmpty, orderBy } from 'lodash'
+import axios from 'axios'
 
 import ModelEndpointsView from './ModelEndpointsView'
 
 import detailsActions from '../../../actions/details'
-import { GROUP_BY_NONE, MODEL_ENDPOINTS_TAB } from '../../../constants'
+import { GROUP_BY_NONE, MODEL_ENDPOINTS_TAB, REQUEST_CANCELED } from '../../../constants'
 import { cancelRequest } from '../../../utils/cancelRequest'
 import { createModelEndpointsRowData } from '../../../utils/createArtifactsContent'
 import { fetchModelEndpoints, removeModelEndpoints } from '../../../reducers/artifactsReducer'
@@ -35,10 +36,12 @@ import { setFilters } from '../../../reducers/filtersReducer'
 import { useModelsPage } from '../ModelsPage.context'
 
 import { ReactComponent as Yaml } from 'igz-controls/images/yaml.svg'
+import { showLargeResponsePopUp } from '../../../utils/showLargeResponsePopUp'
 
 const ModelEndpoints = () => {
   const [modelEndpoints, setModelEndpoints] = useState([])
   const [selectedModelEndpoint, setSelectedModelEndpoint] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const artifactsStore = useSelector(store => store.artifactsStore)
   const detailsStore = useSelector(store => store.detailsStore)
   const filtersStore = useSelector(store => store.filtersStore)
@@ -66,20 +69,43 @@ const ModelEndpoints = () => {
 
   const fetchData = useCallback(
     filters => {
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(modelEndpointsRef, REQUEST_CANCELED)
+      }, 30000)
+      const config = {
+        cancelToken: new axios.CancelToken(cancel => {
+          modelEndpointsRef.current.cancel = cancel
+        }),
+        params: {
+          metric: 'latency_avg_1h',
+          start: 'now-10m'
+        }
+      }
+
       dispatch(
         fetchModelEndpoints({
           project: params.projectName,
           filters,
-          params: {
-            metric: 'latency_avg_1h',
-            start: 'now-10m'
-          }
+          config
         })
       )
         .unwrap()
         .then(result => {
-          setModelEndpoints(result)
+          if (result.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setModelEndpoints([])
+          } else {
+            setModelEndpoints(result)
+            setLargeRequestErrorMessage('')
+          }
         })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setModelEndpoints([])
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [dispatch, params.projectName]
   )
@@ -161,6 +187,7 @@ const ModelEndpoints = () => {
       artifactsStore={artifactsStore}
       fetchData={fetchData}
       filtersStore={filtersStore}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       modelEndpoints={modelEndpoints}
       pageData={pageData}
       ref={modelEndpointsRef}

@@ -17,33 +17,61 @@ illegal under applicable law, and the grant of the foregoing license
 under the Apache 2.0 license is conditioned upon your compliance with
 such restriction.
 */
-import React, { useContext, useCallback, useState } from 'react'
+import React, { useContext, useCallback, useState, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
+import axios from 'axios'
 
 import { fetchModels } from '../../reducers/artifactsReducer'
 import { setArtifactTags } from '../../utils/artifacts.util'
+import { cancelRequest } from '../../utils/cancelRequest'
+import { showLargeResponsePopUp } from '../../utils/showLargeResponsePopUp'
 import { useYaml } from '../../hooks/yaml.hook'
-import { MODELS_TAB } from '../../constants'
+
+import { MODELS_TAB, REQUEST_CANCELED } from '../../constants'
 
 export const ModelsPageContext = React.createContext({})
 
 export const ModelsPageProvider = ({ children }) => {
   const [models, setModels] = useState([])
   const [allModels, setAllModels] = useState([])
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const [convertedYaml, toggleConvertedYaml] = useYaml('')
   const dispatch = useDispatch()
   const params = useParams()
+  const modelsRef = useRef({ current: null })
 
   const fetchData = useCallback(
     async filters => {
-      return dispatch(fetchModels({ project: params.projectName, filters: filters }))
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(modelsRef, REQUEST_CANCELED)
+      }, 30000)
+      const config = {
+        cancelToken: new axios.CancelToken(cancel => {
+          modelsRef.current.cancel = cancel
+        })
+      }
+
+      return dispatch(fetchModels({ project: params.projectName, filters: filters, config }))
         .unwrap()
         .then(modelsResponse => {
-          setArtifactTags(modelsResponse, setModels, setAllModels, filters, dispatch, MODELS_TAB)
+          if (modelsResponse.length > 1500) {
+            setArtifactTags([], setModels, setAllModels, filters, dispatch, MODELS_TAB)
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+          } else {
+            setArtifactTags(modelsResponse, setModels, setAllModels, filters, dispatch, MODELS_TAB)
+            setLargeRequestErrorMessage('')
 
-          return modelsResponse
+            return modelsResponse
+          }
         })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            setArtifactTags([], setModels, setAllModels, filters, dispatch, MODELS_TAB)
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [dispatch, setModels, params.projectName]
   )
@@ -57,7 +85,8 @@ export const ModelsPageProvider = ({ children }) => {
         allModels,
         setModels,
         setAllModels,
-        toggleConvertedYaml
+        toggleConvertedYaml,
+        largeRequestErrorMessage
       }}
     >
       {children}

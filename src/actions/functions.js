@@ -221,8 +221,9 @@ const functionsActions = {
         dispatch(functionsActions.fetchFunctionsFailure(err.message))
       })
   },
-  fetchFunctionsBegin: () => ({
-    type: FETCH_FUNCTIONS_BEGIN
+  fetchFunctionsBegin: withoutLoader => ({
+    type: FETCH_FUNCTIONS_BEGIN,
+    payload: withoutLoader
   }),
   fetchFunctionsFailure: error => ({
     type: FETCH_FUNCTIONS_FAILURE,

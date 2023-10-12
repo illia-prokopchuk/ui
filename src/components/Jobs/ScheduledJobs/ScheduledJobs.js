@@ -17,10 +17,11 @@ illegal under applicable law, and the grant of the foregoing license
 under the Apache 2.0 license is conditioned upon your compliance with
 such restriction.
 */
-import React, { useCallback, useState, useMemo, useEffect } from 'react'
+import React, { useCallback, useState, useMemo, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import { get } from 'lodash'
+import axios from 'axios'
 
 import FilterMenu from '../../FilterMenu/FilterMenu'
 import JobWizard from '../../JobWizard/JobWizard'
@@ -36,10 +37,12 @@ import {
   LABELS_FILTER,
   NAME_FILTER,
   PANEL_EDIT_MODE,
+  REQUEST_CANCELED,
   SCHEDULE_TAB
 } from '../../../constants'
 import { DANGER_BUTTON, FORBIDDEN_ERROR_STATUS_CODE } from 'igz-controls/constants'
 import { JobsContext } from '../Jobs'
+import { showLargeResponsePopUp } from '../../../utils/showLargeResponsePopUp'
 import { createJobsScheduleTabContent } from '../../../utils/createJobsContent'
 import { getJobFunctionData } from '../jobs.util'
 import { generateContentActionsMenu } from '../../../layout/Content/content.util'
@@ -55,6 +58,7 @@ import { ReactComponent as Yaml } from 'igz-controls/images/yaml.svg'
 import { ReactComponent as Run } from 'igz-controls/images/run.svg'
 import { ReactComponent as Edit } from 'igz-controls/images/edit.svg'
 import { ReactComponent as Delete } from 'igz-controls/images/delete.svg'
+import { cancelRequest } from '../../../utils/cancelRequest'
 
 const ScheduledJobs = ({
   fetchFunctionTemplate,
@@ -68,10 +72,12 @@ const ScheduledJobs = ({
   const [dataIsLoaded, setDataIsLoaded] = useState(false)
   const [convertedYaml, toggleConvertedYaml] = useYaml('')
   const [editableItem, setEditableItem] = useState(null)
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const dispatch = useDispatch()
   const params = useParams()
   const filtersStore = useSelector(store => store.filtersStore)
   const jobsStore = useSelector(store => store.jobsStore)
+  const fetchJobsRef = useRef({ current: {} })
   const {
     jobWizardIsOpened,
     jobWizardMode,
@@ -97,21 +103,44 @@ const ScheduledJobs = ({
 
   const refreshJobs = useCallback(
     filters => {
-      fetchJobs(params.projectName, filters, true)
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(fetchJobsRef, REQUEST_CANCELED)
+      }, 30000)
+
+      fetchJobs(
+        params.projectName,
+        filters,
+        true,
+        new axios.CancelToken(cancel => {
+          fetchJobsRef.current.cancel = cancel
+        })
+      )
         .then(jobs => {
-          setJobs(jobs.map(job => parseJob(job, SCHEDULE_TAB)))
+          if (jobs.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setJobs([])
+          } else {
+            setJobs(jobs.map(job => parseJob(job, SCHEDULE_TAB)))
+            setLargeRequestErrorMessage('')
+          }
         })
         .catch(error => {
-          dispatch(
-            setNotification({
-              status: error?.response?.status || 400,
-              id: Math.random(),
-              message: 'Failed to fetch jobs',
-              retry: () => refreshJobs(filters),
-              error
-            })
-          )
+          if (error.message === REQUEST_CANCELED) {
+            setJobs([])
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+          } else {
+            dispatch(
+              setNotification({
+                status: error?.response?.status || 400,
+                id: Math.random(),
+                message: 'Failed to fetch jobs',
+                retry: () => refreshJobs(filters),
+                error
+              })
+            )
+          }
         })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [dispatch, fetchJobs, params.projectName]
   )
@@ -297,7 +326,12 @@ const ScheduledJobs = ({
         </div>
       </div>
       {jobsStore.loading ? null : jobs.length === 0 ? (
-        <NoData message={getNoDataMessage(filtersStore, filters, JOBS_PAGE, SCHEDULE_TAB)} />
+        <NoData
+          message={
+            largeRequestErrorMessage ||
+            getNoDataMessage(filtersStore, filters, JOBS_PAGE, SCHEDULE_TAB)
+          }
+        />
       ) : (
         <>
           <Table
