@@ -32,6 +32,7 @@ import {
   FEATURE_STORE_PAGE,
   GROUP_BY_NAME,
   GROUP_BY_NONE,
+  REQUEST_CANCELED,
   TAG_FILTER_ALL_ITEMS,
   TAG_LATEST
 } from '../../../constants'
@@ -42,12 +43,13 @@ import { createFeatureSetsRowData } from '../../../utils/createFeatureStoreConte
 import { getFeatureSetIdentifier } from '../../../utils/getUniqueIdentifier'
 import { isDetailsTabExists } from '../../../utils/isDetailsTabExists'
 import { parseFeatureSets } from '../../../utils/parseFeatureSets'
+import { parseChipsData } from '../../../utils/convertChipsData'
+import { showLargeResponsePopUp } from '../../../utils/showLargeResponsePopUp'
 import { getFilterTagOptions, setFilters } from '../../../reducers/filtersReducer'
 import { setNotification } from '../../../reducers/notificationReducer'
 import { useGetTagOptions } from '../../../hooks/useGetTagOptions.hook'
 import { useGroupContent } from '../../../hooks/groupContent.hook'
 import { useOpenPanel } from '../../../hooks/openPanel.hook'
-import { parseChipsData } from '../../../utils/convertChipsData'
 
 import { ReactComponent as Yaml } from 'igz-controls/images/yaml.svg'
 
@@ -64,6 +66,7 @@ const FeatureSets = ({
   const [featureSets, setFeatureSets] = useState([])
   const [selectedFeatureSet, setSelectedFeatureSet] = useState({})
   const [selectedRowData, setSelectedRowData] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
 
   const openPanelByDefault = useOpenPanel()
   const [urlTagOption] = useGetTagOptions(fetchFeatureSetsTags, featureSetsFilters)
@@ -101,17 +104,34 @@ const FeatureSets = ({
 
   const fetchData = useCallback(
     filters => {
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(featureStoreRef, REQUEST_CANCELED)
+      }, 30000)
       const config = {
         cancelToken: new axios.CancelToken(cancel => {
           featureStoreRef.current.cancel = cancel
         })
       }
 
-      return fetchFeatureSets(params.projectName, filters, config).then(result => {
-        setFeatureSets(parseFeatureSets(result))
+      return fetchFeatureSets(params.projectName, filters, config)
+        .then(result => {
+          if (result.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setFeatureSets([])
+          } else {
+            setFeatureSets(parseFeatureSets(result))
+            setLargeRequestErrorMessage('')
 
-        return result
-      })
+            return result
+          }
+        })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setFeatureSets([])
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [fetchFeatureSets, params.projectName]
   )
@@ -351,6 +371,7 @@ const FeatureSets = ({
       filtersStore={filtersStore}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       pageData={pageData}
       ref={featureStoreRef}
       selectedFeatureSet={selectedFeatureSet}

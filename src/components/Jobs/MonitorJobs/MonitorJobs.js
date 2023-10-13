@@ -32,7 +32,6 @@ import NoData from '../../../common/NoData/NoData'
 import Table from '../../Table/Table'
 import TableTop from '../../../elements/TableTop/TableTop'
 import YamlModal from '../../../common/YamlModal/YamlModal'
-import { ConfirmDialog } from 'igz-controls/components'
 
 import { DANGER_BUTTON, TERTIARY_BUTTON } from 'igz-controls/constants'
 import {
@@ -54,6 +53,7 @@ import { datePickerOptions, PAST_WEEK_DATE_OPTION } from '../../../utils/datePic
 import { getCloseDetailsLink } from '../../../utils/getCloseDetailsLink'
 import { getNoDataMessage } from '../../../utils/getNoDataMessage'
 import { enrichRunWithFunctionFields, handleAbortJob } from '../jobs.util'
+import { showLargeResponsePopUp } from '../../../utils/showLargeResponsePopUp'
 import { isDetailsTabExists } from '../../../utils/isDetailsTabExists'
 import { cancelRequest } from '../../../utils/cancelRequest'
 import { openPopUp } from 'igz-controls/utils/common.util'
@@ -158,8 +158,13 @@ const MonitorJobs = ({
       )
         .then(jobs => {
           if (jobs.length > 1500) {
-            showJobsErrorPopUp()
-            setJobRuns([])
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+
+            if (params.jobName) {
+              setJobRuns([])
+            } else {
+              setJobs([])
+            }
           } else {
             const parsedJobs = jobs.map(job => parseJob(job, MONITOR_JOBS_TAB))
 
@@ -173,8 +178,13 @@ const MonitorJobs = ({
         })
         .catch(error => {
           if (error.message === REQUEST_CANCELED) {
-            showJobsErrorPopUp()
-            setJobRuns([])
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+
+            if (params.jobName) {
+              setJobRuns([])
+            } else {
+              setJobs([])
+            }
           } else {
             dispatch(
               setNotification({
@@ -187,15 +197,6 @@ const MonitorJobs = ({
           }
         })
         .finally(() => clearTimeout(cancelJobsRequestTimeout))
-
-      const showJobsErrorPopUp = () => {
-        const errorMessage =
-          'The query result is too large to display. Add a filter (or narrow it) to retrieve fewer results.'
-        openPopUp(ConfirmDialog, {
-          message: errorMessage
-        })
-        setLargeRequestErrorMessage(errorMessage)
-      }
     },
     [dispatch, fetchAllJobRuns, fetchJobs, params.jobName, params.projectName]
   )

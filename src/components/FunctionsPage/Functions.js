@@ -21,6 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import { isEqual, isEmpty } from 'lodash'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios'
 
 import FunctionsView from './FunctionsView'
 import JobWizard from '../JobWizard/JobWizard'
@@ -46,6 +47,7 @@ import {
   FUNCTIONS_PAGE,
   GROUP_BY_NAME,
   PANEL_FUNCTION_CREATE_MODE,
+  REQUEST_CANCELED,
   SHOW_UNTAGGED_ITEMS,
   TAG_LATEST
 } from '../../constants'
@@ -54,6 +56,8 @@ import { DANGER_BUTTON, LABEL_BUTTON } from 'igz-controls/constants'
 import { functionRunKinds } from '../Jobs/jobs.util'
 import { generateContentActionsMenu } from '../../layout/Content/content.util'
 import { openPopUp } from 'igz-controls/utils/common.util'
+import { showLargeResponsePopUp } from '../../utils/showLargeResponsePopUp'
+import { cancelRequest } from '../../utils/cancelRequest'
 import { useGroupContent } from '../../hooks/groupContent.hook'
 import { useMode } from '../../hooks/mode.hook'
 import { useYaml } from '../../hooks/yaml.hook'
@@ -81,9 +85,11 @@ const Functions = ({
   const [functionsPanelIsOpen, setFunctionsPanelIsOpen] = useState(false)
   const [jobWizardIsOpened, setJobWizardIsOpened] = useState(false)
   const [jobWizardMode, setJobWizardMode] = useState(null)
-  const filtersStore = useSelector(store => store.filtersStore)
   const [selectedRowData, setSelectedRowData] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
+  const filtersStore = useSelector(store => store.filtersStore)
   let fetchFunctionLogsTimeout = useRef(null)
+  const functionsRef = useRef(null)
   const { isStagingMode } = useMode()
   const params = useParams()
   const navigate = useNavigate()
@@ -92,13 +98,36 @@ const Functions = ({
 
   const refreshFunctions = useCallback(
     filters => {
-      return fetchFunctions(params.projectName, filters).then(functions => {
-        const newFunctions = parseFunctions(functions, params.projectName)
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(functionsRef, REQUEST_CANCELED)
+      }, 30000)
+      const config = {
+        cancelToken: new axios.CancelToken(cancel => {
+          functionsRef.current.cancel = cancel
+        })
+      }
 
-        setFunctions(newFunctions)
+      return fetchFunctions(params.projectName, filters, config)
+        .then(functions => {
+          if (functions.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setFunctions([])
+          } else {
+            const newFunctions = parseFunctions(functions, params.projectName)
 
-        return newFunctions
-      })
+            setLargeRequestErrorMessage('')
+            setFunctions(newFunctions)
+
+            return newFunctions
+          }
+        })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            setFunctions([])
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [fetchFunctions, params.projectName]
   )
@@ -479,9 +508,9 @@ const Functions = ({
     <FunctionsView
       actionsMenu={actionsMenu}
       closePanel={closePanel}
-      createFunctionSuccess={createFunctionSuccess}
       confirmData={confirmData}
       convertedYaml={convertedYaml}
+      createFunctionSuccess={createFunctionSuccess}
       editableItem={editableItem}
       expand={expand}
       filtersChangeCallback={filtersChangeCallback}
@@ -495,7 +524,9 @@ const Functions = ({
       handleExpandAll={handleExpandAll}
       handleExpandRow={handleExpandRow}
       handleSelectFunction={handleSelectFunction}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       pageData={pageData}
+      ref={functionsRef}
       refreshFunctions={refreshFunctions}
       selectedFunction={selectedFunction}
       selectedRowData={selectedRowData}

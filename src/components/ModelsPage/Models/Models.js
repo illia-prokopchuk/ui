@@ -80,7 +80,7 @@ const Models = ({ fetchModelFeatureVector }) => {
     () => generatePageData(selectedModel, viewMode),
     [selectedModel, viewMode]
   )
-  const { fetchData, models, allModels, setModels, setAllModels, toggleConvertedYaml } =
+  const { fetchData, models, allModels, setModels, setAllModels, toggleConvertedYaml, largeRequestErrorMessage } =
     useModelsPage()
   const frontendSpec = useSelector(store => store.appStore.frontendSpec)
   const modelsFilters = useMemo(
@@ -313,6 +313,7 @@ const Models = ({ fetchModelFeatureVector }) => {
       filtersStore={filtersStore}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       models={models}
       pageData={pageData}
       ref={modelsRef}
@@ -323,8 +324,8 @@ const Models = ({ fetchModelFeatureVector }) => {
       setSelectedRowData={setSelectedRowData}
       sortProps={{ sortTable, selectedColumnName, getSortingIcon }}
       tableContent={sortedTableContent}
-      viewMode={viewMode}
       urlTagOption={urlTagOption}
+      viewMode={viewMode}
     />
   )
 }

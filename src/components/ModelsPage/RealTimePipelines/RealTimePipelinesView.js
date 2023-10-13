@@ -43,6 +43,7 @@ const RealTimePipelinesView = React.forwardRef(
       filtersStore,
       handleExpandAll,
       handleExpandRow,
+      largeRequestErrorMessage,
       pageData,
       params,
       pipelines,
@@ -77,12 +78,10 @@ const RealTimePipelinesView = React.forwardRef(
             </div>
             {artifactsStore.loading ? null : pipelines.length === 0 ? (
               <NoData
-                message={getNoDataMessage(
-                  filtersStore,
-                  filters,
-                  MODELS_PAGE,
-                  REAL_TIME_PIPELINES_TAB
-                )}
+                message={
+                  largeRequestErrorMessage ||
+                  getNoDataMessage(filtersStore, filters, MODELS_PAGE, REAL_TIME_PIPELINES_TAB)
+                }
               />
             ) : params.pipelineId ? (
               <Pipeline content={pipelines} />
@@ -129,6 +128,7 @@ RealTimePipelinesView.propTypes = {
   filtersStore: PropTypes.object.isRequired,
   handleExpandAll: PropTypes.func.isRequired,
   handleExpandRow: PropTypes.func.isRequired,
+  largeRequestErrorMessage: PropTypes.string.isRequired,
   pageData: PropTypes.object.isRequired,
   params: PropTypes.object.isRequired,
   pipelines: PropTypes.arrayOf(PropTypes.object).isRequired,

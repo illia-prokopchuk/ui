@@ -21,6 +21,7 @@ import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { isNil } from 'lodash'
+import axios from 'axios'
 
 import DatasetsView from './DatasetsView'
 import AddArtifactTagPopUp from '../../elements/AddArtifactTagPopUp/AddArtifactTagPopUp'
@@ -31,6 +32,7 @@ import {
   FILTER_MENU_MODAL,
   GROUP_BY_NAME,
   GROUP_BY_NONE,
+  REQUEST_CANCELED,
   TAG_FILTER_ALL_ITEMS
 } from '../../constants'
 import {
@@ -51,6 +53,7 @@ import { createDatasetsRowData } from '../../utils/createArtifactsContent'
 import { getArtifactIdentifier } from '../../utils/getUniqueIdentifier'
 import { isDetailsTabExists } from '../../utils/isDetailsTabExists'
 import { openPopUp } from 'igz-controls/utils/common.util'
+import { showLargeResponsePopUp } from '../../utils/showLargeResponsePopUp'
 import { setArtifactTags } from '../../utils/artifacts.util'
 import { setFilters } from '../../reducers/filtersReducer'
 import { setNotification } from '../../reducers/notificationReducer'
@@ -67,6 +70,7 @@ const Datasets = () => {
   const [allDatasets, setAllDatasets] = useState([])
   const [selectedDataset, setSelectedDataset] = useState({})
   const [selectedRowData, setSelectedRowData] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const [convertedYaml, toggleConvertedYaml] = useYaml('')
   const [urlTagOption] = useGetTagOptions(null, filters, null, DATASETS_FILTERS)
   const artifactsStore = useSelector(store => store.artifactsStore)
@@ -96,20 +100,56 @@ const Datasets = () => {
 
   const fetchData = useCallback(
     filters => {
-      dispatch(fetchDataSets({ project: params.projectName, filters }))
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(datasetsRef, REQUEST_CANCELED)
+      }, 30000)
+      const config = {
+        cancelToken: new axios.CancelToken(cancel => {
+          datasetsRef.current.cancel = cancel
+        })
+      }
+
+      dispatch(fetchDataSets({ project: params.projectName, filters, config }))
         .unwrap()
         .then(dataSetsResponse => {
-          setArtifactTags(
-            dataSetsResponse,
-            setDatasets,
-            setAllDatasets,
-            filters,
-            dispatch,
-            DATASETS_PAGE
-          )
+          if (dataSetsResponse.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setArtifactTags(
+              [],
+              setDatasets,
+              setAllDatasets,
+              filters,
+              dispatch,
+              DATASETS_PAGE
+            )
+          } else {
+            setArtifactTags(
+              dataSetsResponse,
+              setDatasets,
+              setAllDatasets,
+              filters,
+              dispatch,
+              DATASETS_PAGE
+            )
+            setLargeRequestErrorMessage('')
 
-          return dataSetsResponse
+            return dataSetsResponse
+          }
         })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setArtifactTags(
+              [],
+              setDatasets,
+              setAllDatasets,
+              filters,
+              dispatch,
+              DATASETS_PAGE
+            )
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [dispatch, params.projectName]
   )
@@ -300,6 +340,7 @@ const Datasets = () => {
       filtersStore={filtersStore}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       pageData={pageData}
       ref={datasetsRef}
       selectedDataset={selectedDataset}

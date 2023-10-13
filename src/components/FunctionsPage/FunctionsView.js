@@ -36,128 +36,139 @@ import { SECONDARY_BUTTON } from 'igz-controls/constants'
 import { filters } from './functions.util'
 import { FUNCTIONS_PAGE, PANEL_CREATE_MODE, PANEL_EDIT_MODE } from '../../constants'
 
-const FunctionsView = ({
-  actionsMenu,
-  closePanel,
-  confirmData,
-  convertedYaml,
-  createFunctionSuccess,
-  editableItem,
-  expand,
-  filtersChangeCallback,
-  filtersStore,
-  functionsPanelIsOpen,
-  functionsStore,
-  getPopUpTemplate,
-  handleCancel,
-  handleDeployFunctionFailure,
-  handleDeployFunctionSuccess,
-  handleExpandAll,
-  handleExpandRow,
-  handleSelectFunction,
-  pageData,
-  refreshFunctions,
-  selectedFunction,
-  selectedRowData,
-  tableContent,
-  taggedFunctions,
-  toggleConvertedYaml
-}) => {
-  const params = useParams()
-  return (
-    <>
-      <div className="content-wrapper">
-        <div className="content__header">
-          <Breadcrumbs />
-        </div>
-        <div className="content">
-          <div className="table-container">
-            <div className="content__action-bar-wrapper">
-              <div className="action-bar">
-                <FilterMenu
-                  actionButton={{
-                    getCustomTemplate: getPopUpTemplate,
-                    label: 'New',
-                    variant: SECONDARY_BUTTON
-                  }}
-                  expand={expand}
-                  filters={filters}
-                  handleExpandAll={handleExpandAll}
-                  onChange={filtersChangeCallback}
-                  page={FUNCTIONS_PAGE}
-                />
+const FunctionsView = React.forwardRef(
+  (
+    {
+      actionsMenu,
+      closePanel,
+      confirmData,
+      convertedYaml,
+      createFunctionSuccess,
+      editableItem,
+      expand,
+      filtersChangeCallback,
+      filtersStore,
+      functionsPanelIsOpen,
+      functionsStore,
+      getPopUpTemplate,
+      handleCancel,
+      handleDeployFunctionFailure,
+      handleDeployFunctionSuccess,
+      handleExpandAll,
+      handleExpandRow,
+      handleSelectFunction,
+      largeRequestErrorMessage,
+      pageData,
+      refreshFunctions,
+      selectedFunction,
+      selectedRowData,
+      tableContent,
+      taggedFunctions,
+      toggleConvertedYaml
+    },
+    ref
+  ) => {
+    const params = useParams()
+    return (
+      <>
+        <div className="content-wrapper" ref={ref}>
+          <div className="content__header">
+            <Breadcrumbs />
+          </div>
+          <div className="content">
+            <div className="table-container">
+              <div className="content__action-bar-wrapper">
+                <div className="action-bar">
+                  <FilterMenu
+                    actionButton={{
+                      getCustomTemplate: getPopUpTemplate,
+                      label: 'New',
+                      variant: SECONDARY_BUTTON
+                    }}
+                    expand={expand}
+                    filters={filters}
+                    handleExpandAll={handleExpandAll}
+                    onChange={filtersChangeCallback}
+                    page={FUNCTIONS_PAGE}
+                  />
+                </div>
               </div>
+              {functionsStore.loading ? (
+                <Loader />
+              ) : taggedFunctions.length === 0 ? (
+                <NoData
+                  message={
+                    largeRequestErrorMessage ||
+                    getNoDataMessage(filtersStore, filters, FUNCTIONS_PAGE)
+                  }
+                />
+              ) : (
+                <>
+                  <Table
+                    actionsMenu={actionsMenu}
+                    content={taggedFunctions}
+                    handleCancel={handleCancel}
+                    pageData={pageData}
+                    retryRequest={refreshFunctions}
+                    selectedItem={selectedFunction}
+                    tableHeaders={tableContent[0]?.content ?? []}
+                  >
+                    {tableContent.map((tableItem, index) => {
+                      return (
+                        <FunctionsTableRow
+                          actionsMenu={actionsMenu}
+                          handleExpandRow={handleExpandRow}
+                          handleSelectItem={handleSelectFunction}
+                          rowIndex={index}
+                          key={index}
+                          rowItem={tableItem}
+                          selectedItem={selectedFunction}
+                          selectedRowData={selectedRowData}
+                        />
+                      )
+                    })}
+                  </Table>
+                </>
+              )}
             </div>
-            {functionsStore.loading ? (
-              <Loader />
-            ) : taggedFunctions.length === 0 ? (
-              <NoData message={getNoDataMessage(filtersStore, filters, FUNCTIONS_PAGE)} />
-            ) : (
-              <>
-                <Table
-                  actionsMenu={actionsMenu}
-                  content={taggedFunctions}
-                  handleCancel={handleCancel}
-                  pageData={pageData}
-                  retryRequest={refreshFunctions}
-                  selectedItem={selectedFunction}
-                  tableHeaders={tableContent[0]?.content ?? []}
-                >
-                  {tableContent.map((tableItem, index) => {
-                    return (
-                      <FunctionsTableRow
-                        actionsMenu={actionsMenu}
-                        handleExpandRow={handleExpandRow}
-                        handleSelectItem={handleSelectFunction}
-                        rowIndex={index}
-                        key={index}
-                        rowItem={tableItem}
-                        selectedItem={selectedFunction}
-                        selectedRowData={selectedRowData}
-                      />
-                    )
-                  })}
-                </Table>
-              </>
-            )}
           </div>
         </div>
-      </div>
-      {functionsPanelIsOpen && (
-        <FunctionsPanel
-          closePanel={closePanel}
-          createFunctionSuccess={createFunctionSuccess}
-          defaultData={editableItem}
-          handleDeployFunctionFailure={handleDeployFunctionFailure}
-          handleDeployFunctionSuccess={handleDeployFunctionSuccess}
-          mode={editableItem ? PANEL_EDIT_MODE : PANEL_CREATE_MODE}
-          project={params.projectName}
-        />
-      )}
-      {confirmData && (
-        <ConfirmDialog
-          cancelButton={{
-            handler: confirmData.rejectHandler,
-            label: confirmData.btnCancelLabel,
-            variant: confirmData.btnCancelVariant
-          }}
-          closePopUp={confirmData.rejectHandler}
-          confirmButton={{
-            handler: () => confirmData.confirmHandler(confirmData.item),
-            label: confirmData.btnConfirmLabel,
-            variant: confirmData.btnConfirmVariant
-          }}
-          header={confirmData.header}
-          isOpen={confirmData}
-          message={confirmData.message}
-        />
-      )}
-      {convertedYaml.length > 0 && (
-        <YamlModal convertedYaml={convertedYaml} toggleConvertToYaml={toggleConvertedYaml} />
-      )}
-    </>
-  )
-}
+        {functionsPanelIsOpen && (
+          <FunctionsPanel
+            closePanel={closePanel}
+            createFunctionSuccess={createFunctionSuccess}
+            defaultData={editableItem}
+            handleDeployFunctionFailure={handleDeployFunctionFailure}
+            handleDeployFunctionSuccess={handleDeployFunctionSuccess}
+            mode={editableItem ? PANEL_EDIT_MODE : PANEL_CREATE_MODE}
+            project={params.projectName}
+          />
+        )}
+        {confirmData && (
+          <ConfirmDialog
+            cancelButton={{
+              handler: confirmData.rejectHandler,
+              label: confirmData.btnCancelLabel,
+              variant: confirmData.btnCancelVariant
+            }}
+            closePopUp={confirmData.rejectHandler}
+            confirmButton={{
+              handler: () => confirmData.confirmHandler(confirmData.item),
+              label: confirmData.btnConfirmLabel,
+              variant: confirmData.btnConfirmVariant
+            }}
+            header={confirmData.header}
+            isOpen={confirmData}
+            message={confirmData.message}
+          />
+        )}
+        {convertedYaml.length > 0 && (
+          <YamlModal convertedYaml={convertedYaml} toggleConvertToYaml={toggleConvertedYaml} />
+        )}
+      </>
+    )
+  }
+)
 
 FunctionsView.defaultPropTypes = {
   confirmData: null,
@@ -183,6 +194,7 @@ FunctionsView.propTypes = {
   handleExpandAll: PropTypes.func.isRequired,
   handleExpandRow: PropTypes.func.isRequired,
   handleSelectFunction: PropTypes.func.isRequired,
+  largeRequestErrorMessage: PropTypes.string.isRequired,
   pageData: PropTypes.object.isRequired,
   refreshFunctions: PropTypes.func.isRequired,
   selectedFunction: PropTypes.object.isRequired,

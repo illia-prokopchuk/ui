@@ -134,14 +134,12 @@ const artifactsApi = {
       }
     )
   },
-  getModelEndpoints: (project, filters, params = {}) => {
+  getModelEndpoints: (project, filters, config = {}) => {
     if (filters?.labels) {
-      params.label = filters.labels?.split(',')
+      config.params.label = filters.labels?.split(',')
     }
 
-    return mainHttpClient.get(`/projects/${project}/model-endpoints`, {
-      params
-    })
+    return mainHttpClient.get(`/projects/${project}/model-endpoints`, config)
   },
   getModels: (project, filters) => {
     return fetchArtifacts(project, filters, { params: { category: MODEL_TYPE, format: 'full' } })

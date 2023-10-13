@@ -71,18 +71,24 @@ const jobsApi = {
       `/projects/${project}/schedules/${postData.scheduled_object.task.metadata.name}`,
       postData
     ),
-  getJobs: (project, filters, isAllJobs) => {
-    const params = {
-      project,
-      ...generateRequestParams(filters)
+  getJobs: (project, filters, cancelToken, isAllJobs) => {
+    const config = {
+      params: {
+        project,
+        ...generateRequestParams(filters)
+      }
     }
 
     if (!isAllJobs) {
-      params['partition-by'] = 'name'
-      params['partition-sort-by'] = 'updated'
+      config.params['partition-by'] = 'name'
+      config.params['partition-sort-by'] = 'updated'
     }
 
-    return mainHttpClient.get('/runs', { params })
+    if (cancelToken) {
+      config.cancelToken = cancelToken
+    }
+
+    return mainHttpClient.get('/runs', config)
   },
   getSpecificJobs: (project, filters, jobList) => {
     const params = {
@@ -107,7 +113,7 @@ const jobsApi = {
       config.cancelToken = cancelToken
     }
 
-    return mainHttpClient.get('/runs', config )
+    return mainHttpClient.get('/runs', config)
   },
   getJob: (project, jobId, iter) => {
     const params = {}
@@ -122,24 +128,30 @@ const jobsApi = {
     fetch(`${mainBaseUrl}/log/${project}/${id}`, {
       method: 'get'
     }),
-  getScheduledJobs: (project, filters) => {
-    const params = {
-      include_last_run: 'yes'
+  getScheduledJobs: (project, filters, cancelToken) => {
+    const config = {
+      params: {
+        include_last_run: 'yes'
+      }
     }
 
     if (filters?.owner) {
-      params.owner = filters.owner
+      config.params.owner = filters.owner
     }
 
     if (filters?.name) {
-      params.name = `~${filters.name}`
+      config.params.name = `~${filters.name}`
     }
 
     if (filters?.labels) {
-      params.labels = filters.labels?.split(',')
+      config.params.labels = filters.labels?.split(',')
     }
 
-    return mainHttpClient.get(`/projects/${project}/schedules`, { params })
+    if (cancelToken) {
+      config.cancelToken = cancelToken
+    }
+
+    return mainHttpClient.get(`/projects/${project}/schedules`, config)
   },
   removeScheduledJob: (project, scheduleName) =>
     mainHttpClient.delete(`/projects/${project}/schedules/${scheduleName}`),

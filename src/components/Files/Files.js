@@ -21,6 +21,7 @@ import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { isNil } from 'lodash'
+import axios from 'axios'
 
 import AddArtifactTagPopUp from '../../elements/AddArtifactTagPopUp/AddArtifactTagPopUp'
 import FilesView from './FilesView'
@@ -31,6 +32,7 @@ import {
   FILTER_MENU_MODAL,
   GROUP_BY_NAME,
   GROUP_BY_NONE,
+  REQUEST_CANCELED,
   TAG_FILTER_ALL_ITEMS
 } from '../../constants'
 import {
@@ -47,6 +49,7 @@ import { getArtifactIdentifier } from '../../utils/getUniqueIdentifier'
 import { isDetailsTabExists } from '../../utils/isDetailsTabExists'
 import { openPopUp } from 'igz-controls/utils/common.util'
 import { setArtifactTags } from '../../utils/artifacts.util'
+import { showLargeResponsePopUp } from '../../utils/showLargeResponsePopUp'
 import { setFilters } from '../../reducers/filtersReducer'
 import { setNotification } from '../../reducers/notificationReducer'
 import { useGetTagOptions } from '../../hooks/useGetTagOptions.hook'
@@ -62,6 +65,7 @@ const Files = () => {
   const [allFiles, setAllFiles] = useState([])
   const [selectedFile, setSelectedFile] = useState({})
   const [selectedRowData, setSelectedRowData] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const [convertedYaml, toggleConvertedYaml] = useYaml('')
   const [urlTagOption] = useGetTagOptions(null, filters, null, FILES_FILTERS)
   const artifactsStore = useSelector(store => store.artifactsStore)
@@ -88,13 +92,35 @@ const Files = () => {
 
   const fetchData = useCallback(
     filters => {
-      dispatch(fetchFiles({ project: params.projectName, filters }))
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(filesRef, REQUEST_CANCELED)
+      }, 30000)
+      const config = {
+        cancelToken: new axios.CancelToken(cancel => {
+          filesRef.current.cancel = cancel
+        })
+      }
+
+      dispatch(fetchFiles({ project: params.projectName, filters, config }))
         .unwrap()
         .then(filesResponse => {
-          setArtifactTags(filesResponse, setFiles, setAllFiles, filters, dispatch, FILES_PAGE)
+          if (filesResponse.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setArtifactTags([], setFiles, setAllFiles, filters, dispatch, FILES_PAGE)
+          } else {
+            setArtifactTags(filesResponse, setFiles, setAllFiles, filters, dispatch, FILES_PAGE)
+            setLargeRequestErrorMessage('')
 
-          return filesResponse
+            return filesResponse
+          }
         })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setArtifactTags([], setFiles, setAllFiles, filters, dispatch, FILES_PAGE)
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [dispatch, params.projectName]
   )
@@ -283,6 +309,7 @@ const Files = () => {
       filtersStore={filtersStore}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       pageData={pageData}
       ref={filesRef}
       selectedFile={selectedFile}

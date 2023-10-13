@@ -58,14 +58,18 @@ const workflowActions = {
     type: FETCH_WORKFLOW_FAILURE,
     payload: error
   }),
-  fetchWorkflows: (project, filter) => dispatch => {
+  fetchWorkflows: (project, filter, cancelToken) => dispatch => {
     dispatch(workflowActions.fetchWorkflowsBegin())
 
     return workflowApi
-      .getWorkflows(project, filter)
-      .then(response =>
-        dispatch(workflowActions.fetchWorkflowsSuccess(parseWorkflows(response.data.runs)))
-      )
+      .getWorkflows(project, filter, cancelToken)
+      .then(response => {
+        const parsedWorkflows = parseWorkflows(response.data.runs)
+
+        dispatch(workflowActions.fetchWorkflowsSuccess(parsedWorkflows))
+
+        return parsedWorkflows
+      })
       .catch(error => dispatch(workflowActions.fetchWorkflowsFailure(error)))
   },
   fetchWorkflowsBegin: () => ({

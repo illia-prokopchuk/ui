@@ -145,9 +145,9 @@ export const fetchArtifactsFunctions = createAsyncThunk(
 )
 export const fetchModelEndpoints = createAsyncThunk(
   'fetchModelEndpoints',
-  ({ project, filters, params }) => {
+  ({ project, filters, config }) => {
     return artifactsApi
-      .getModelEndpoints(project, filters, params)
+      .getModelEndpoints(project, filters, config)
       .then(({ data: { endpoints = [] } }) => {
         return generateModelEndpoints(endpoints)
       })

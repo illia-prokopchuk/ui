@@ -31,6 +31,7 @@ import {
   FEATURE_VECTORS_TAB,
   GROUP_BY_NAME,
   GROUP_BY_NONE,
+  REQUEST_CANCELED,
   TAG_FILTER_ALL_ITEMS,
   TAG_FILTER_LATEST
 } from '../../../constants'
@@ -45,6 +46,7 @@ import { cancelRequest } from '../../../utils/cancelRequest'
 import { checkTabIsValid, handleApplyDetailsChanges } from '../featureStore.util'
 import { createFeatureVectorsRowData } from '../../../utils/createFeatureStoreContent'
 import { getFeatureVectorIdentifier } from '../../../utils/getUniqueIdentifier'
+import { showLargeResponsePopUp } from '../../../utils/showLargeResponsePopUp'
 import { getFilterTagOptions, setFilters } from '../../../reducers/filtersReducer'
 import { isDetailsTabExists } from '../../../utils/isDetailsTabExists'
 import { parseFeatureVectors } from '../../../utils/parseFeatureVectors'
@@ -67,6 +69,7 @@ const FeatureVectors = ({
   const [featureVectors, setFeatureVectors] = useState([])
   const [selectedFeatureVector, setSelectedFeatureVector] = useState({})
   const [selectedRowData, setSelectedRowData] = useState({})
+  const [largeRequestErrorMessage, setLargeRequestErrorMessage] = useState('')
   const openPanelByDefault = useOpenPanel()
   const [urlTagOption] = useGetTagOptions(fetchFeatureVectorsTags, featureVectorsFilters)
   const params = useParams()
@@ -86,30 +89,44 @@ const FeatureVectors = ({
 
   const pageData = useMemo(() => generatePageData(selectedFeatureVector), [selectedFeatureVector])
 
-  const detailsFormInitialValues = useMemo(
-    () => {
-        return {
-          features: (selectedFeatureVector.specFeatures ?? []).map( featureData => {
-              return {...parseFeatureTemplate(featureData)}
-          })
-        }
-    },
-    [selectedFeatureVector.specFeatures]
-  )
+  const detailsFormInitialValues = useMemo(() => {
+    return {
+      features: (selectedFeatureVector.specFeatures ?? []).map(featureData => {
+        return { ...parseFeatureTemplate(featureData) }
+      })
+    }
+  }, [selectedFeatureVector.specFeatures])
 
   const fetchData = useCallback(
     filters => {
+      const cancelRequestTimeout = setTimeout(() => {
+        cancelRequest(featureVectorsRef, REQUEST_CANCELED)
+      }, 30000)
       const config = {
         cancelToken: new axios.CancelToken(cancel => {
           featureVectorsRef.current.cancel = cancel
         })
       }
 
-      return fetchFeatureVectors(params.projectName, filters, config).then(result => {
-        setFeatureVectors(parseFeatureVectors(result))
+      return fetchFeatureVectors(params.projectName, filters, config)
+        .then(result => {
+          if (result.length > 1500) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setFeatureVectors([])
+          } else {
+            setFeatureVectors(parseFeatureVectors(result))
+            setLargeRequestErrorMessage('')
 
-        return result
-      })
+            return result
+          }
+        })
+        .catch(error => {
+          if (error.message === REQUEST_CANCELED) {
+            showLargeResponsePopUp(setLargeRequestErrorMessage)
+            setFeatureVectors([])
+          }
+        })
+        .finally(() => clearTimeout(cancelRequestTimeout))
     },
     [fetchFeatureVectors, params.projectName]
   )
@@ -430,6 +447,7 @@ const FeatureVectors = ({
       filtersStore={filtersStore}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      largeRequestErrorMessage={largeRequestErrorMessage}
       pageData={pageData}
       ref={featureVectorsRef}
       selectedFeatureVector={selectedFeatureVector}

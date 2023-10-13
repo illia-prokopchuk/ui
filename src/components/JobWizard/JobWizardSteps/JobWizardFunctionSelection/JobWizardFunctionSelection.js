@@ -292,9 +292,10 @@ const JobWizardFunctionSelection = ({
       promisesArray.push(fetchHubFunctionsPromise)
     }
 
-    Promise.all([promisesArray.map(promise => promise())]).finally(() => {
-      setIsLoading(false)
-    })
+    Promise.all(promisesArray.map(promise => promise()))
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const selectProjectFunction = functionData => {
