@@ -61,6 +61,7 @@ const FormParametersRow = ({
   fieldsPath,
   formState,
   getTableArrayErrors,
+  hasKwargs,
   index,
   isCurrentRowEditing,
   rowPath,
@@ -431,7 +432,7 @@ const FormParametersRow = ({
                 </div>
                 <FormRowActions
                   applyChanges={applyChanges}
-                  deleteButtonIsHidden={fieldData.isPredefined}
+                  deleteButtonIsHidden={fieldData.isRequired || !hasKwargs}
                   deleteRow={deleteRow}
                   disabled={isRowDisabled()}
                   discardOrDelete={discardOrDelete}
@@ -455,6 +456,7 @@ const FormParametersRow = ({
 FormParametersRow.defaultProps = {
   disabled: false,
   editingItem: null,
+  hasKwargs: false,
   withHyperparameters: false,
   withRequiredParameters: true
 }
@@ -469,6 +471,7 @@ FormParametersRow.propTypes = {
   fields: PropTypes.shape({}).isRequired,
   fieldsPath: PropTypes.string.isRequired,
   formState: PropTypes.shape({}).isRequired,
+  hasKwargs: PropTypes.bool,
   index: PropTypes.number.isRequired,
   isCurrentRowEditing: PropTypes.func.isRequired,
   rowPath: PropTypes.string.isRequired,
