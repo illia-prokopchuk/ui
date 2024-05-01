@@ -69,6 +69,7 @@ function RegisterModelModal({ actions, isOpen, onResolve, params, refresh }) {
       onSubmit: () => {}
     })
   )
+  const formStateRef = React.useRef()
   const location = useLocation()
   const { handleCloseModal, resolveModal } = useModalBlockHistory(onResolve, formRef.current)
   const dispatch = useDispatch()
@@ -102,6 +103,7 @@ function RegisterModelModal({ actions, isOpen, onResolve, params, refresh }) {
 
     const handleRegisterModel = () => {
       return artifactApi.registerArtifact(params.projectName, data).then(response => {
+        formStateRef.current.form.reset?.(formStateRef.current.initialValues)
         resolveModal()
         refresh()
         dispatch(
@@ -119,11 +121,11 @@ function RegisterModelModal({ actions, isOpen, onResolve, params, refresh }) {
       .then(response => {
         if (response?.data) {
           if (!isEmpty(response.data.artifacts)) {
-            openPopUp(ConfirmDialog, {
+            return openPopUp(ConfirmDialog, {
               confirmButton: {
                 label: 'Overwrite',
                 variant: PRIMARY_BUTTON,
-                handler: handleRegisterModel
+                handler: () => {}
               },
               cancelButton: {
                 label: 'Cancel',
@@ -131,7 +133,7 @@ function RegisterModelModal({ actions, isOpen, onResolve, params, refresh }) {
               },
               header: createModelMessages.overwriteConfirmTitle,
               message: createModelMessages.getOverwriteConfirmMessage(response.data.artifacts[0].kind)
-            })
+            }).then(handleRegisterModel)
           } else {
             return handleRegisterModel()
           }
@@ -167,6 +169,8 @@ function RegisterModelModal({ actions, isOpen, onResolve, params, refresh }) {
   return (
     <Form form={formRef.current} onSubmit={registerModel}>
       {formState => {
+        formStateRef.current = formState
+
         return (
           <Modal
             actions={getModalActions(formState)}

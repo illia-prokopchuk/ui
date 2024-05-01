@@ -306,6 +306,8 @@ const JobWizard = ({
           if (isSchedule) {
             setShowSchedule(state => !state)
           }
+
+          formStateRef.current.form.reset?.(formStateRef.current.initialValues)
           resolveModal()
           onSuccessRequest && onSuccessRequest()
           dispatch(
