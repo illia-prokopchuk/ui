@@ -79,6 +79,7 @@ const RegisterArtifactModal = ({
       onSubmit: () => {}
     })
   )
+  const formStateRef = React.useRef(null)
   const location = useLocation()
   const dispatch = useDispatch()
   const { handleCloseModal, resolveModal } = useModalBlockHistory(onResolve, formRef.current)
@@ -110,6 +111,7 @@ const RegisterArtifactModal = ({
 
     const handleRegisterArtifact = () => {
       return artifactApi.registerArtifact(params.projectName, data).then(response => {
+        formStateRef.current.form.reset?.(formStateRef.current.initialValues)
         resolveModal()
         refresh()
         dispatch(
@@ -129,11 +131,11 @@ const RegisterArtifactModal = ({
       .then(response => {
         if (response?.data) {
           if (!isEmpty(response.data.artifacts)) {
-            openPopUp(ConfirmDialog, {
+            return openPopUp(ConfirmDialog, {
               confirmButton: {
                 label: 'Overwrite',
                 variant: PRIMARY_BUTTON,
-                handler: handleRegisterArtifact
+                handler: () => {}
               },
               cancelButton: {
                 label: 'Cancel',
@@ -141,9 +143,7 @@ const RegisterArtifactModal = ({
               },
               header: messagesByKind.overwriteConfirmTitle,
               message: messagesByKind.getOverwriteConfirmMessage(response.data.artifacts[0].kind)
-            })
-
-            return null
+            }).then(handleRegisterArtifact)
           } else {
             return handleRegisterArtifact()
           }
@@ -183,6 +183,8 @@ const RegisterArtifactModal = ({
   return (
     <Form form={formRef.current} onSubmit={registerArtifact}>
       {formState => {
+        formStateRef.current = formState
+
         return (
           <Modal
             data-testid="register-artifact"
