@@ -1152,12 +1152,12 @@ export const getSaveJobErrorMsg = error => {
 }
 
 export const getParameterTypeOptions = (parameterType = '') => {
-  const match = parameterType.match(/Union\[(.*?)\]$/)
+  const unionTypes = parameterType.match(/Union\[(.*?)\]$/)
 
-  if (match) {
+  if (unionTypes) {
     const uniqueUnionTypesList = [
       ...new Set(
-        match[1].split(',').map(unionType => {
+        unionTypes[1].split(',').map(unionType => {
           const trimmedUnionType = unionType.trim().toLowerCase()
 
           return trimmedUnionType.startsWith('list') ? 'list' : trimmedUnionType
@@ -1174,6 +1174,10 @@ export const getParameterTypeOptions = (parameterType = '') => {
     }
 
     return parametersValueTypeOptions
+  } else if (parameterType) {
+    return parametersValueTypeOptions.filter(option =>
+      parameterType === option.id
+    )
   }
 
   return parametersValueTypeOptions
