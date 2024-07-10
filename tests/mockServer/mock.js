@@ -1140,6 +1140,17 @@ function getArtifacts(req, res) {
   res.send({ artifacts: collectedArtifacts })
 }
 
+function getArtifact(req, res) {
+  let collectedArtifacts = artifacts.artifacts.filter(
+    artifact =>
+      (artifact.metadata?.project === req.params.project || artifact.project === req.params.project) &&
+      (artifact.spec?.db_key === req.params.key || artifact?.db_key === req.params.key) &&
+      (artifact.metadata?.tree === req.query.tree || artifact?.tree === req.query.tree)
+  )
+
+  res.send(collectedArtifacts[0])
+}
+
 function getProjectsFeatureSets(req, res) {
   const featureArtifactTags = featureSets.feature_sets
     .filter(artifact => artifact.metadata.project === req.params.project)
@@ -2253,6 +2264,7 @@ app.get(`${mlrunAPIIngress}/projects/:project/pipelines/:pipelineID`, getPipelin
 app.get(`${mlrunAPIIngress}/projects/:project/artifact-tags`, getProjectsArtifactTags)
 app.get(`${mlrunAPIIngressV2}/projects/:project/artifacts`, getArtifacts)
 app.post(`${mlrunAPIIngressV2}/projects/:project/artifacts`, postArtifact)
+app.get(`${mlrunAPIIngressV2}/projects/:project/artifacts/:key`, getArtifact)
 app.put(`${mlrunAPIIngressV2}/projects/:project/artifacts/:key`, putArtifact)
 app.delete(`${mlrunAPIIngressV2}/projects/:project/artifacts/:key`, deleteArtifact)
 
