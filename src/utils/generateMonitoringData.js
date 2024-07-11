@@ -64,9 +64,7 @@ export const generateMonitoringStats = (data, navigate, dispatch, tab) => {
         {
           counter: data.running,
           link: () =>
-            navigateToJobsMonitoringPage({
-              state: ['running', 'created', 'pending', 'unknown', 'aborting']
-            }),
+            navigateToJobsMonitoringPage({ state: ['running', 'pending', 'aborting'] }),
           statusClass: 'running'
         },
         {
