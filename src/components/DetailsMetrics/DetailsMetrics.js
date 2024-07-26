@@ -62,6 +62,7 @@ const DetailsMetrics = ({ selectedItem }) => {
   const [isInvocationCardExpanded, setIsInvocationCardExpanded] = useState(true)
   const enableScrollRef = useRef(true)
   const invocationBodyCardRef = useRef(null)
+  const invocationBodyCardIsResizingRef = useRef(false)
   const metricsContainerRef = useRef(null)
   const metricsValuesAbortController = useRef(new AbortController())
   const prevScrollPositionRef = useRef(0)
@@ -184,6 +185,7 @@ const DetailsMetrics = ({ selectedItem }) => {
       })
 
       const shouldCollapse =
+        !invocationBodyCardIsResizingRef.current &&
         isInvocationCardExpanded &&
         enableScrollRef.current &&
         selectedMetrics.length > 0 &&
@@ -199,6 +201,7 @@ const DetailsMetrics = ({ selectedItem }) => {
       }
 
       prevScrollPositionRef.current = scrollTopPosition
+      invocationBodyCardIsResizingRef.current = false
     },
     [isInvocationCardExpanded, detailsStore.metricsOptions.selectedByEndpoint, selectedItem]
   )
@@ -254,6 +257,22 @@ const DetailsMetrics = ({ selectedItem }) => {
 
     setSelectedDate(timeRangeMapping[selectedDate])
   }, [detailsStore.dates.selectedOptionId])
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      invocationBodyCardIsResizingRef.current = true })
+    const scrollContainer = invocationBodyCardRef.current
+
+    if (scrollContainer) {
+      resizeObserver.observe(scrollContainer)
+    }
+
+    return () => {
+      if (scrollContainer) {
+        resizeObserver.unobserve(scrollContainer)
+      }
+    }
+  }, [])
 
   const fetchData = useCallback(
     (selectedMetricsParams, preInvocationMetricParams, selectedItemProject, selectedItemUid) => {
@@ -449,7 +468,7 @@ const DetailsMetrics = ({ selectedItem }) => {
                               <span>{metric.totalDriftStatus.text}</span>
                               <span
                                 className={`metrics__card-drift-status metrics__card-drift-status-${metric.totalDriftStatus.className}`}
-                              ></span>
+                              />
                             </div>
                           </Tooltip>
                         )}
