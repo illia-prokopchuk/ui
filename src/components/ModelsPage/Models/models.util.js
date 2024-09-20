@@ -338,9 +338,10 @@ export const generateActionsMenu = (
             const downloadPath = `${model?.target_path}${model?.model_file || ''}`
             dispatch(
               setDownloadItem({
+                id: downloadPath,
                 path: downloadPath,
-                user: model.producer?.owner,
-                id: downloadPath
+                projectName,
+                user: model.producer?.owner
               })
             )
             dispatch(setShowDownloadsList(true))

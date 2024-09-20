@@ -21,7 +21,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
-import { useParams } from 'react-router-dom'
 
 import { RoundedIcon, Tooltip, TextTooltipTemplate } from 'igz-controls/components'
 
@@ -39,7 +38,6 @@ const DownloadItem = ({ downloadItem }) => {
   const [progress, setProgress] = useState(0)
   const [isDownload, setDownload] = useState(true)
   const [isSuccessResponse, setIsSuccessResponse] = useState(null)
-  const params = useParams()
   const downloadAbortControllerRef = useRef(null)
   const timeoutRef = useRef(null)
   const dispatch = useDispatch()
@@ -71,7 +69,7 @@ const DownloadItem = ({ downloadItem }) => {
       }
 
       mainHttpClient
-        .get(`projects/${params.projectName}/files`, config)
+        .get(`projects/${downloadItem.projectName}/files`, config)
         .then(response => {
           downloadFile(file, response)
           if (downloadAbortControllerRef.current) {
@@ -103,7 +101,7 @@ const DownloadItem = ({ downloadItem }) => {
   }, [
     isDownload,
     downloadItem.path,
-    params.projectName,
+    downloadItem.projectName,
     downloadItem.user,
     file,
     dispatch,
@@ -172,6 +170,7 @@ DownloadItem.propTypes = {
     filename: PropTypes.string,
     id: PropTypes.string.isRequired,
     path: PropTypes.string.isRequired,
+    projectName: PropTypes.string.isRequired,
     user: PropTypes.string
   }).isRequired
 }

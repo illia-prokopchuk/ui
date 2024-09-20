@@ -97,6 +97,7 @@ const PreviewModal = ({ artifact }) => {
               <Download
                 onlyIcon
                 path={`${artifact.target_path}${artifact.model_file ? artifact.model_file : ''}`}
+                projectName={params.projectName}
                 user={artifact.ui.user ?? artifact.producer?.owner}
               />
             </div>
@@ -111,7 +112,7 @@ const PreviewModal = ({ artifact }) => {
             {preview[0]?.hidden && artifact.extra_data?.length > 0 ? null : (
               <ArtifactsPreview noData={noData} preview={preview} />
             )}
-            {artifact.extra_data?.length > 0 && <ArtifactsExtraData artifact={artifact} />}
+            {artifact.extra_data?.length > 0 && <ArtifactsExtraData artifact={artifact} projectName={params.projectName} />}
           </div>
         </div>
       </div>

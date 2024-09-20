@@ -282,9 +282,10 @@ export const generateActionsMenu = (
             const downloadPath = `${dataset?.target_path}${dataset?.model_file || ''}`
             dispatch(
               setDownloadItem({
+                id: downloadPath,
                 path: downloadPath,
-                user: dataset.producer?.owner,
-                id: downloadPath
+                projectName,
+                user: dataset.producer?.owner
               })
             )
             dispatch(setShowDownloadsList(true))
