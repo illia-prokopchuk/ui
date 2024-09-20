@@ -36,6 +36,7 @@ const Download = ({
   fileName,
   onlyIcon = false,
   path,
+  projectName,
   user,
   withoutIcon = false
 }) => {
@@ -49,6 +50,7 @@ const Download = ({
         filename: fileName,
         id: path + Date.now(),
         path,
+        projectName,
         user: user
       })
     )
@@ -84,6 +86,7 @@ Download.propTypes = {
   fileName: PropTypes.string,
   onlyIcon: PropTypes.bool,
   path: PropTypes.string.isRequired,
+  projectName: PropTypes.string.isRequired,
   user: PropTypes.string,
   withoutIcon: PropTypes.bool
 }

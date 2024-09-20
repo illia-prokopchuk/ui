@@ -113,7 +113,7 @@ export const fetchArtifactPreviewFromExtraData = (
   })
 }
 
-export const generateExtraDataContent = (extraData, showArtifactPreview) => {
+export const generateExtraDataContent = (extraData, showArtifactPreview, projectName) => {
   return extraData.map((extraDataItem, index) => {
     return [
       {
@@ -147,6 +147,7 @@ export const generateExtraDataContent = (extraData, showArtifactPreview) => {
               className="icon-download"
               onlyIcon
               path={extraDataItem.path}
+              projectName={projectName}
               //TODO: add user after BE part will be done
               // user={artifact.ui.user}
             />

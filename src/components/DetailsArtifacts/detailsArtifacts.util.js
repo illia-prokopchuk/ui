@@ -135,6 +135,7 @@ export const generateArtifactsTabContent = (artifacts, params, iteration, showAr
               className="icon-download"
               onlyIcon
               path={artifact.target_path}
+              projectName={params.projectName}
               user={artifact.ui.user}
             />
           </>

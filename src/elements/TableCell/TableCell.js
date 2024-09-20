@@ -20,6 +20,7 @@ such restriction.
 import React, { cloneElement } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router-dom'
 import classnames from 'classnames'
 
 import ChipCell from '../../common/ChipCell/ChipCell'
@@ -52,6 +53,7 @@ const TableCell = ({
   showExpandButton = false
 }) => {
   const dispatch = useDispatch()
+  const params = useParams()
   const { value: stateValue, label: stateLabel, className: stateClassName } = item.state ?? {}
   const cellClassNames = classnames(
     'table-body__cell',
@@ -157,6 +159,7 @@ const TableCell = ({
           disabled={data.disabled}
           onlyIcon
           path={`${item?.target_path}${item?.model_file ? item.model_file : ''}`}
+          projectName={params.projectName}
           user={item?.producer?.owner || item.user}
         />
       </td>

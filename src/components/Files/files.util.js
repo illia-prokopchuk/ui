@@ -254,9 +254,10 @@ export const generateActionsMenu = (
             const downloadPath = `${fileMin?.target_path}${fileMin?.model_file || ''}`
             dispatch(
               setDownloadItem({
+                id: downloadPath,
                 path: downloadPath,
-                user: file.producer?.owner,
-                id: downloadPath
+                projectName,
+                user: file.producer?.owner
               })
             )
             dispatch(setShowDownloadsList(true))

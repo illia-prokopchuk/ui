@@ -30,7 +30,7 @@ import { generateArtifactIdentifiers } from '../../components/Details/details.ut
 
 import './artifactsExtraData.scss'
 
-const ArtifactsExtraData = ({ artifact }) => {
+const ArtifactsExtraData = ({ artifact, projectName }) => {
   const [artifactsIds, setArtifactsIds] = useState([])
 
   const showArtifactPreview = useCallback(
@@ -47,8 +47,8 @@ const ArtifactsExtraData = ({ artifact }) => {
   }, [artifact])
 
   const extraData = useMemo(() => {
-    return generateExtraDataContent(artifactExtraDataWithId, showArtifactPreview)
-  }, [artifactExtraDataWithId, showArtifactPreview])
+    return generateExtraDataContent(artifactExtraDataWithId, showArtifactPreview, projectName)
+  }, [artifactExtraDataWithId, showArtifactPreview, projectName])
 
   useEffect(() => {
     return () => {
@@ -122,7 +122,8 @@ const ArtifactsExtraData = ({ artifact }) => {
 }
 
 ArtifactsExtraData.propTypes = {
-  artifact: PropTypes.object.isRequired
+  artifact: PropTypes.object.isRequired,
+  projectName: PropTypes.string.isRequired
 }
 
 export default ArtifactsExtraData
