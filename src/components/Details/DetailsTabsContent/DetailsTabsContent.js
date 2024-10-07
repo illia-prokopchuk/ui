@@ -68,6 +68,7 @@ const DetailsTabsContent = ({
   applyChangesRef,
   formState,
   handlePreview,
+  retryRequest,
   pageData,
   selectedItem,
   setChanges,
@@ -87,6 +88,7 @@ const DetailsTabsContent = ({
           formState={formState}
           pageData={pageData}
           ref={applyChangesRef}
+          retryRequest={retryRequest}
           selectedItem={selectedItem}
           setChangesCounter={setChangesCounter}
           setChangesData={setChangesData}

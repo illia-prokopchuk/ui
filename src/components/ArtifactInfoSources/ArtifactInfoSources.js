@@ -19,13 +19,26 @@ such restriction.
 */
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { Tooltip, TextTooltipTemplate } from 'igz-controls/components'
 
+import { removeFilters, setFilters } from '../../reducers/filtersReducer'
+
 import './artifactInfoSources.scss'
 
-const ArtifactInfoSources = ({ sources = {} }) => {
+const ArtifactInfoSources = ({ sources = {}, retryRequest = () => {} }) => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const handleSourceClick = (path, name) => {
+    dispatch(removeFilters())
+    dispatch(setFilters({name}))
+    retryRequest({ name })
+    navigate(path)
+  }
+
   return (
     <div className="info-sources" data-testid="sources">
       <h3 className="item-info__header">Sources</h3>
@@ -44,7 +57,7 @@ const ArtifactInfoSources = ({ sources = {} }) => {
               <Tooltip template={<TextTooltipTemplate text={sourceData.value} />}>
                 {
                   sourceData.link ? (
-                    <Link to={sourceData.link} className="link" reloadDocument>
+                    <Link className="link" onClick={() => handleSourceClick(sourceData.link, sourceData.name)}>
                       {sourceData.value}
                     </Link>
                   ) : sourceData.value

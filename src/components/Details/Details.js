@@ -275,6 +275,7 @@ const Details = ({
               applyChangesRef={applyChangesRef}
               formState={formState}
               handlePreview={handlePreview}
+              retryRequest={retryRequest}
               pageData={pageData}
               selectedItem={selectedItem}
               setChanges={setChanges}
