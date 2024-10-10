@@ -59,9 +59,9 @@ const DetailsInfoView = React.forwardRef(
       handleDiscardChanges,
       handleFinishEdit,
       handleInfoItemClick,
+      handleRefreshAndExpandRow,
       pageData,
       params,
-      retryRequest,
       selectedItem,
       setChangesData
     },
@@ -215,7 +215,7 @@ const DetailsInfoView = React.forwardRef(
                 </>
               )}
               {!isEveryObjectValueEmpty(additionalInfo.sources) && (
-                <ArtifactInfoSources sources={additionalInfo.sources} retryRequest={retryRequest} />
+                <ArtifactInfoSources handleRefreshAndExpandRow={handleRefreshAndExpandRow} sources={additionalInfo.sources} />
               )}
             </div>
           )}

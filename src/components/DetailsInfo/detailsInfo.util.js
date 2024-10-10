@@ -253,8 +253,7 @@ export const generateSourcesDetailsInfo = (selectedItem, projectName) => {
 
     source[key] = {
       value: value,
-      link: value.startsWith(MLRUN_STORAGE_INPUT_PATH_SCHEME) ? generateStoreResourceLink(parsedUri, projectName) : '',
-      name: parsedUri.key
+      link: value.startsWith(MLRUN_STORAGE_INPUT_PATH_SCHEME) ? generateStoreResourceLink(parsedUri, projectName) : ''
     }
 
     return { ...acc, ...source }

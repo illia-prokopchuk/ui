@@ -51,6 +51,7 @@ const ModelsView = React.forwardRef(
       getAndSetSelectedArtifact,
       handleExpandRow,
       handleRefresh,
+      handleRefreshAndExpandRow,
       handleRegisterModel,
       handleTrainModel,
       isDemoMode,
@@ -134,6 +135,7 @@ const ModelsView = React.forwardRef(
                   applyDetailsChangesCallback={applyDetailsChangesCallback}
                   detailsFormInitialValues={detailsFormInitialValues}
                   handleCancel={() => setSelectedModelMin({})}
+                  handleRefreshAndExpandRow={handleRefreshAndExpandRow}
                   pageData={pageData}
                   retryRequest={handleRefresh}
                   selectedItem={selectedModel}
@@ -168,6 +170,7 @@ const ModelsView = React.forwardRef(
                 detailsMenu={pageData.details.menu}
                 formInitialValues={detailsFormInitialValues}
                 handleRefresh={getAndSetSelectedArtifact}
+                handleRefreshAndExpandRow={handleRefreshAndExpandRow}
                 isDetailsScreen
                 pageData={pageData}
                 selectedItem={selectedModel}

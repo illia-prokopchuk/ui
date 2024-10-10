@@ -317,7 +317,7 @@ const Datasets = () => {
       }
     })
 
-  useInitialTableFetch({
+  const handleRefreshAndExpandRow = useInitialTableFetch({
     createRowData: rowItem => createDatasetsRowData(rowItem, params.projectName, frontendSpec),
     fetchData,
     fetchTags,
@@ -411,6 +411,7 @@ const Datasets = () => {
       getAndSetSelectedArtifact={getAndSetSelectedArtifact}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      handleRefreshAndExpandRow={handleRefreshAndExpandRow}
       handleRegisterDataset={handleRegisterDataset}
       maxArtifactsErrorIsShown={maxArtifactsErrorIsShown}
       pageData={pageData}

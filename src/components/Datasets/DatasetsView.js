@@ -55,6 +55,7 @@ const DatasetsView = React.forwardRef(
       getAndSetSelectedArtifact,
       handleExpandRow,
       handleRefresh,
+      handleRefreshAndExpandRow,
       handleRegisterDataset,
       maxArtifactsErrorIsShown,
       pageData,
@@ -128,6 +129,7 @@ const DatasetsView = React.forwardRef(
                     applyDetailsChangesCallback={applyDetailsChangesCallback}
                     detailsFormInitialValues={detailsFormInitialValues}
                     handleCancel={() => setSelectedDatasetMin({})}
+                    handleRefreshAndExpandRow={handleRefreshAndExpandRow}
                     pageData={pageData}
                     retryRequest={handleRefresh}
                     selectedItem={selectedDataset}
@@ -161,6 +163,7 @@ const DatasetsView = React.forwardRef(
                   formInitialValues={detailsFormInitialValues}
                   detailsMenu={pageData.details.menu}
                   handleRefresh={getAndSetSelectedArtifact}
+                  handleRefreshAndExpandRow={handleRefreshAndExpandRow}
                   isDetailsScreen
                   pageData={pageData}
                   selectedItem={selectedDataset}

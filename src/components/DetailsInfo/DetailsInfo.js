@@ -37,7 +37,7 @@ import {
 
 const DetailsInfo = React.forwardRef(
   (
-    { detailsStore, formState, pageData, retryRequest, selectedItem, setChangesData, setChangesCounter },
+    { detailsStore, formState, pageData, handleRefreshAndExpandRow, selectedItem, setChangesData, setChangesCounter },
     applyChangesRef
   ) => {
     const [detailsInfoState, detailsInfoDispatch] = useReducer(detailsInfoReducer, initialState)
@@ -138,10 +138,10 @@ const DetailsInfo = React.forwardRef(
         handleDiscardChanges={handleDiscardChanges}
         handleFinishEdit={finishEdit}
         handleInfoItemClick={handleInfoItemClick}
+        handleRefreshAndExpandRow={handleRefreshAndExpandRow}
         pageData={pageData}
         params={params}
         ref={editItemRef}
-        retryRequest={retryRequest}
         selectedItem={selectedItem}
         setChangesData={setChangesData}
       />
