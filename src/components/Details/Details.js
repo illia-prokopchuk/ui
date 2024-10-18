@@ -68,6 +68,7 @@ const Details = ({
   getCloseDetailsLink = null,
   handleCancel = null,
   handleRefresh = () => {},
+  handleRefreshAndExpandRow = () => {},
   isDetailsScreen = false,
   pageData,
   removeInfoContent,
@@ -275,6 +276,7 @@ const Details = ({
               applyChangesRef={applyChangesRef}
               formState={formState}
               handlePreview={handlePreview}
+              handleRefreshAndExpandRow={handleRefreshAndExpandRow}
               pageData={pageData}
               selectedItem={selectedItem}
               setChanges={setChanges}

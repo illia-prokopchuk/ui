@@ -39,6 +39,7 @@ const Table = React.forwardRef(
       detailsFormInitialValues = {},
       getCloseDetailsLink = null,
       handleCancel = () => {},
+      handleRefreshAndExpandRow = () => {},
       hideActionsMenu = false,
       mainRowItemsCount = 1,
       pageData,
@@ -121,6 +122,7 @@ const Table = React.forwardRef(
         detailsFormInitialValues={detailsFormInitialValues}
         getCloseDetailsLink={getCloseDetailsLink}
         handleCancel={handleCancel}
+        handleRefreshAndExpandRow={handleRefreshAndExpandRow}
         hideActionsMenu={hideActionsMenu}
         isTablePanelOpen={tableStore.isTablePanelOpen}
         mainRowItemsCount={mainRowItemsCount}
