@@ -59,7 +59,7 @@ export const useInitialTableFetch = ({
           setExpandedRowsData,
           sortExpandedRowsDataBy
         } = {}) => {
-          if (!isInitialRequestSent.current) {
+          if (!isInitialRequestSent.current && fetchData) {
             if (fetchTags) {
               fetchTags()
             }
@@ -90,6 +90,20 @@ export const useInitialTableFetch = ({
       ),
     []
   )
+
+  const handleRefreshAndExpandRow = () => {
+    isInitialRequestSent.current = false
+
+    sendInitialRequest(
+      createRowData,
+      dispatch,
+      filters,
+      fetchData,
+      fetchTags,
+      setExpandedRowsData,
+      sortExpandedRowsDataBy
+    )
+  }
 
   useLayoutEffect(() => {
     if (!isInitialRequestSent.current) {
@@ -147,4 +161,6 @@ export const useInitialTableFetch = ({
     },
     [params.projectName]
   )
+
+  return handleRefreshAndExpandRow
 }

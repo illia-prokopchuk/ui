@@ -369,7 +369,7 @@ const Models = ({ fetchModelFeatureVector }) => {
     handleRefresh(modelsFilters)
   }
 
-  useInitialTableFetch({
+  const handleRefreshAndExpandRow = useInitialTableFetch({
     createRowData: rowItem => createModelsRowData(rowItem, params.projectName, frontendSpec),
     fetchData,
     fetchTags,
@@ -521,6 +521,7 @@ const Models = ({ fetchModelFeatureVector }) => {
       getAndSetSelectedArtifact={getAndSetSelectedArtifact}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      handleRefreshAndExpandRow={handleRefreshAndExpandRow}
       handleRegisterModel={handleRegisterModel}
       handleTrainModel={handleTrainModel}
       isDemoMode={isDemoMode}

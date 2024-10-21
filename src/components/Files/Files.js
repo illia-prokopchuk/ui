@@ -308,7 +308,7 @@ const Files = () => {
     handleRefresh(filesFilters)
   }
 
-  useInitialTableFetch({
+  const handleRefreshAndExpandRow = useInitialTableFetch({
     createRowData: rowItem => createFilesRowData(rowItem, params.projectName, frontendSpec),
     fetchData,
     fetchTags,
@@ -404,6 +404,7 @@ const Files = () => {
       getAndSetSelectedArtifact={getAndSetSelectedArtifact}
       handleExpandRow={handleExpandRow}
       handleRefresh={handleRefresh}
+      handleRefreshAndExpandRow={handleRefreshAndExpandRow}
       handleRegisterArtifact={handleRegisterArtifact}
       handleSelectFile={handleSelectFile}
       maxArtifactsErrorIsShown={maxArtifactsErrorIsShown}

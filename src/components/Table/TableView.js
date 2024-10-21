@@ -37,6 +37,7 @@ const TableView = ({
   detailsFormInitialValues,
   getCloseDetailsLink = null,
   handleCancel,
+  handleRefreshAndExpandRow,
   hideActionsMenu,
   isTablePanelOpen,
   mainRowItemsCount,
@@ -106,6 +107,7 @@ const TableView = ({
             detailsMenu={pageData.details.menu}
             formInitialValues={detailsFormInitialValues}
             handleCancel={handleCancel}
+            handleRefreshAndExpandRow={handleRefreshAndExpandRow}
             pageData={pageData}
             retryRequest={retryRequest}
             selectedItem={selectedItem}
