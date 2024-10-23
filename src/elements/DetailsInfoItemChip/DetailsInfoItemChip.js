@@ -21,10 +21,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import { RoundedIcon, FormChipCell, FormOnChange } from 'igz-controls/components'
 
-import { getValidationRules, getInternalLabelsValidationRule } from 'igz-controls/utils/validation.util'
+import {
+  getValidationRules,
+  getInternalLabelsValidationRule
+} from 'igz-controls/utils/validation.util'
 import { detailsInfoActions } from '../../components/DetailsInfo/detailsInfoReducer'
 import detailsActions from '../../actions/details'
 
@@ -41,6 +45,7 @@ const DetailsInfoItemChip = ({
   item,
   formState
 }) => {
+  const params = useParams()
   const frontendSpec = useSelector(store => store.appStore.frontendSpec)
   const dispatch = useDispatch()
   const chipFieldClassName = classnames(
@@ -72,6 +77,7 @@ const DetailsInfoItemChip = ({
         initialValues={formState.initialValues}
         isEditable
         name={item.fieldData.name}
+        projectName={params.projectName}
         shortChips
         visibleChipsMaxLength="all"
         validationRules={{

@@ -23,6 +23,7 @@ import arrayMutators from 'final-form-arrays'
 import { Form } from 'react-final-form'
 import { useSelector } from 'react-redux'
 import { createForm } from 'final-form'
+import { useParams } from 'react-router-dom'
 
 import ErrorMessage from '../../../common/ErrorMessage/ErrorMessage'
 import Loader from '../../../common/Loader/Loader'
@@ -43,6 +44,7 @@ const CreateProjectDialog = ({
   handleCreateProject,
   removeNewProjectError
 }) => {
+  const params = useParams()
   const projectStore = useSelector(store => store.projectStore)
   const frontendSpec = useSelector(store => store.appStore.frontendSpec)
   const initialValues = {
@@ -89,6 +91,7 @@ const CreateProjectDialog = ({
                   isEditable
                   label="Labels"
                   name="labels"
+                  projectName={params.projectName}
                   shortChips
                   visibleChipsMaxLength="2"
                   validationRules={{

@@ -20,6 +20,7 @@ such restriction.
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import FunctionsPanelGeneralView from './FunctionsPanelGeneralView'
 
@@ -32,6 +33,7 @@ const FunctionsPanelGeneral = ({
   functionsStore,
   setNewFunctionDescription
 }) => {
+  const params = useParams()
   const [data, setData] = useState({
     description: defaultData.description ?? '',
     kind: defaultData.type ?? functionsStore.newFunction.kind,
@@ -51,6 +53,7 @@ const FunctionsPanelGeneral = ({
       formState={formState}
       frontendSpec={frontendSpec}
       handleDescriptionOnBlur={handleDescriptionOnBlur}
+      projectName={params.projectName}
       setData={setData}
       setNewFunctionDescription={setNewFunctionDescription}
     />

@@ -24,6 +24,7 @@ import { Form } from 'react-final-form'
 import { createForm } from 'final-form'
 import { isEmpty } from 'lodash'
 import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 import {
   Button,
@@ -57,6 +58,7 @@ const CreateFeatureVectorPopUp = ({
     labels: {}
   }
 }) => {
+  const params = useParams()
   const [tagTooltipIsHidden, setTagTooltipIsHidden] = useState(false)
   const frontendSpec = useSelector(store => store.appStore.frontendSpec)
   const initialValues = {
@@ -135,6 +137,7 @@ const CreateFeatureVectorPopUp = ({
                   isEditable
                   label="Labels"
                   name="labels"
+                  projectName={params.projectName}
                   shortChips
                   visibleChipsMaxLength="2"
                   validationRules={{

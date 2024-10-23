@@ -30,6 +30,7 @@ const FeatureSetsPanelTitle = ({
   featureStore,
   formState,
   frontendSpec,
+  project,
   setNewFeatureSetDescription,
   setNewFeatureSetName,
   setNewFeatureSetPassthrough,
@@ -78,6 +79,7 @@ const FeatureSetsPanelTitle = ({
       frontendSpec={frontendSpec}
       handleCheckPassthrough={handleCheckPassthrough}
       handleNameOnBlur={handleNameOnBlur}
+      project={project}
       setData={setData}
       setNewFeatureSetDescription={setNewFeatureSetDescription}
       setNewFeatureSetVersion={setNewFeatureSetVersion}

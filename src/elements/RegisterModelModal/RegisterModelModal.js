@@ -233,6 +233,7 @@ function RegisterModelModal({ actions, isOpen, onResolve, params, refresh }) {
                 isEditable
                 label="labels"
                 name="metadata.labels"
+                projectName={params.projectName}
                 shortChips
                 visibleChipsMaxLength="all"
                 validationRules={{

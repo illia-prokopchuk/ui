@@ -258,10 +258,7 @@ const ProjectSettingsGeneral = ({
                       label="Pull at runtime"
                       name={LOAD_SOURCE_ON_RUN}
                     />
-                    <FormOnChange
-                      handler={updateProjectData}
-                      name={LOAD_SOURCE_ON_RUN}
-                    />
+                    <FormOnChange handler={updateProjectData} name={LOAD_SOURCE_ON_RUN} />
                   </div>
                   <div className="settings__artifact-path">
                     <FormInput
@@ -316,6 +313,7 @@ const ProjectSettingsGeneral = ({
                       isEditable
                       label="Labels"
                       name={LABELS}
+                      projectName={params.projectName}
                       shortChips
                       onExitEditModeCallback={updateProjectData}
                       visibleChipsMaxLength="all"
@@ -332,8 +330,10 @@ const ProjectSettingsGeneral = ({
                     <div>
                       <div className="settings__card-title">
                         <span>Node Selectors</span>
-                        <Tip text="Ensure that the node selectors you are configuring are compatible with the available nodes in your cluster. Incompatible node selectors will not be validated at the project level and might result in scheduling issues when running functions.
-                        Node-selector values set in the global settings are not shown. Keep the “Key” and delete the “Value” to remove the global setting." />
+                        <Tip
+                          text="Ensure that the node selectors you are configuring are compatible with the available nodes in your cluster. Incompatible node selectors will not be validated at the project level and might result in scheduling issues when running functions.
+                        Node-selector values set in the global settings are not shown. Keep the “Key” and delete the “Value” to remove the global setting."
+                        />
                       </div>
                       <FormKeyValueTable
                         addNewItemLabel="Add node selector"

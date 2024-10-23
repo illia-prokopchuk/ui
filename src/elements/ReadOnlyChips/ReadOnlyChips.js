@@ -27,7 +27,12 @@ import { FormChipCell } from 'igz-controls/components'
 import { getChipOptions } from '../../utils/getChipOptions'
 import { setFieldState } from 'igz-controls/utils/form.util'
 
-const ReadOnlyChips = ({ labels = [], chipOptions = getChipOptions('metrics'), ...args}) => {
+const ReadOnlyChips = ({
+  labels = [],
+  chipOptions = getChipOptions('metrics'),
+  projectName,
+  ...args
+}) => {
   const formRef = React.useRef(
     createForm({
       initialValues: { labels: labels },
@@ -38,18 +43,19 @@ const ReadOnlyChips = ({ labels = [], chipOptions = getChipOptions('metrics'), .
 
   return (
     <Form form={formRef.current} onSubmit={() => {}}>
-      {
-        formState => {
-          return <FormChipCell
+      {formState => {
+        return (
+          <FormChipCell
             chipOptions={chipOptions}
             formState={formState}
             isEditable={false}
             initialValues={formState.initialValues}
             name="labels"
+            projectName={projectName}
             {...args}
           />
-        }
-      }
+        )
+      }}
     </Form>
   )
 }

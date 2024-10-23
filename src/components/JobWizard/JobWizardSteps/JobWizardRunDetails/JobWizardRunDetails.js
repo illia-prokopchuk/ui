@@ -268,6 +268,7 @@ const JobWizardRunDetails = ({
             isEditable
             label="labels"
             name={`${RUN_DETAILS_STEP}.labels`}
+            projectName={params.projectName}
             shortChips
             visibleChipsMaxLength="all"
             validationRules={{

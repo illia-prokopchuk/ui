@@ -418,6 +418,7 @@ const JobWizardFunctionSelection = ({
                       functionData={generateFunctionCardData(functionData)}
                       onSelectCard={() => selectProjectFunction(functionData)}
                       key={functionData.name}
+                      projectName={params.projectName}
                     />
                   )
                 })}
@@ -477,6 +478,7 @@ const JobWizardFunctionSelection = ({
                         }
                       }}
                       key={templateData.metadata.name}
+                      projectName={params.projectName}
                     />
                   )
                 })}
