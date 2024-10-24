@@ -34,6 +34,7 @@ const FunctionCardTemplate = ({
   formState = {},
   functionData,
   onSelectCard,
+  projectName,
   selected = false
 }) => {
   const templateClassName = classnames(
@@ -67,6 +68,7 @@ const FunctionCardTemplate = ({
           formState={formState}
           initialValues={formState.initialValues}
           name={functionData.labelsName}
+          projectName={projectName}
         />
       )}
       {functionData.links && (
@@ -106,6 +108,7 @@ FunctionCardTemplate.propTypes = {
     sideTag: PropTypes.string
   }).isRequired,
   onSelectCard: PropTypes.func.isRequired,
+  projectName: PropTypes.string.isRequired,
   selected: PropTypes.bool
 }
 

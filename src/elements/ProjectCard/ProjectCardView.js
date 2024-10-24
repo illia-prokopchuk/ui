@@ -96,7 +96,11 @@ const ProjectCardView = React.forwardRef(({ actionsMenu, project, statistics }, 
         {project.metadata.labels && (
           <div className="project-card__info" ref={chipRef} data-testid="project-card__labels">
             <span>Labels:</span>
-            <ReadOnlyChips labels={project.metadata.labels} shortChips />
+            <ReadOnlyChips
+              labels={project.metadata.labels}
+              shortChips
+              projectName={project.metadata.name}
+            />
           </div>
         )}
       </div>

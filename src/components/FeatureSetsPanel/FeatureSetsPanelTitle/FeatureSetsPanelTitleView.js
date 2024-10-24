@@ -26,7 +26,10 @@ import Input from '../../../common/Input/Input'
 import TextArea from '../../../common/TextArea/TextArea'
 import { RoundedIcon, Tip } from 'igz-controls/components'
 
-import { getValidationRules, getInternalLabelsValidationRule } from 'igz-controls/utils/validation.util'
+import {
+  getValidationRules,
+  getInternalLabelsValidationRule
+} from 'igz-controls/utils/validation.util'
 import { getChipOptions } from '../../../utils/getChipOptions'
 
 import { ReactComponent as CloseIcon } from 'igz-controls/images/close.svg'
@@ -41,6 +44,7 @@ const FeatureSetsPanelTitleView = ({
   frontendSpec,
   handleCheckPassthrough,
   handleNameOnBlur,
+  project,
   setData,
   setNewFeatureSetDescription,
   setNewFeatureSetVersion,
@@ -120,6 +124,7 @@ const FeatureSetsPanelTitleView = ({
               isEditable
               label=""
               name="labels"
+              projectName={project}
               shortChips
               visibleChipsMaxLength="all"
               validationRules={{

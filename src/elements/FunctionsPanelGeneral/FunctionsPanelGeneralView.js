@@ -37,6 +37,7 @@ const FunctionsPanelGeneralView = ({
   frontendSpec,
   formState,
   handleDescriptionOnBlur,
+  projectName,
   setData
 }) => {
   return (
@@ -82,6 +83,7 @@ const FunctionsPanelGeneralView = ({
               isEditable
               label=""
               name="labels"
+              projectName={projectName}
               shortChips
               visibleChipsMaxLength="all"
               validationRules={{

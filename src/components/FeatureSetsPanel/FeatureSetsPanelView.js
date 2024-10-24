@@ -76,6 +76,7 @@ const FeatureSetsPanelView = ({
           closePanel={closePanel}
           formState={formState}
           frontendSpec={frontendSpec}
+          project={project}
           setValidation={setValidation}
           validation={validation}
         />

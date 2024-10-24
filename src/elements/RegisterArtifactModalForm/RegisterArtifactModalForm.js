@@ -125,6 +125,7 @@ const RegisterArtifactModalForm = ({
           isEditable
           label="labels"
           name="metadata.labels"
+          projectName={params.projectName}
           shortChips
           visibleChipsMaxLength="2"
           validationRules={{
