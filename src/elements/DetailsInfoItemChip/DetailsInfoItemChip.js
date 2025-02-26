@@ -32,6 +32,7 @@ import {
 import { detailsInfoActions } from '../../components/DetailsInfo/detailsInfoReducer'
 import detailsActions from '../../actions/details'
 
+import { ReactComponent as Close } from 'igz-controls/images/close.svg'
 import { ReactComponent as Checkmark } from 'igz-controls/images/checkmark2.svg'
 
 const DetailsInfoItemChip = ({
@@ -55,7 +56,14 @@ const DetailsInfoItemChip = ({
   )
 
   const setEditMode = useCallback(() => {
-    if (!formState.form.getFieldState(item.fieldData.name).pristine && !isFieldInEditMode) {
+    if (
+      !formState.form.getFieldState(item.fieldData.name).pristine &&
+      !isFieldInEditMode &&
+      !isEqual(
+        formState.values[item.fieldData.name],
+        detailsStore.changes.data?.[item.fieldData.name]?.currentFieldValue
+      )
+    ) {
       detailsInfoDispatch({
         type: detailsInfoActions.SET_EDIT_MODE,
         payload: {
@@ -70,8 +78,10 @@ const DetailsInfoItemChip = ({
   }, [
     currentField,
     detailsInfoDispatch,
+    detailsStore.changes.data,
     dispatch,
     formState.form,
+    formState.values,
     handleFinishEdit,
     isFieldInEditMode,
     item?.editModeType,
@@ -139,6 +149,18 @@ const DetailsInfoItemChip = ({
     }
   }, [frontendSpec.internal_labels, chipsData.validationRules])
 
+  const discardChanges = () => {
+    formState.form.change(
+      item.fieldData.name,
+      detailsStore.changes.data[item.fieldData.name]?.currentFieldValue ??
+        formState.initialValues[item.fieldData.name]
+    )
+    dispatch(detailsActions.setEditMode(false))
+    detailsInfoDispatch({
+      type: detailsInfoActions.RESET_EDIT_MODE
+    })
+  }
+
   return (
     <div className={chipFieldClassName}>
       <FormChipCell
@@ -153,14 +175,19 @@ const DetailsInfoItemChip = ({
       />
       <FormOnChange name={item.fieldData.name} handler={setEditMode} />
       {isFieldInEditMode && (
-        <div className="details-item__apply-btn-wrapper">
-          <RoundedIcon
-            className="details-item__apply-btn"
-            disabled={!formState.valid}
-            onClick={() => handleFinishEdit(item.fieldData.name)}
-            tooltipText="Apply"
-          >
-            <Checkmark />
+        <div className="details-item__buttons-block">
+          <div className="details-item__apply-btn-wrapper">
+            <RoundedIcon
+              className="details-item__apply-btn"
+              disabled={!formState.valid}
+              onClick={() => handleFinishEdit(item.fieldData.name)}
+              tooltipText="Apply"
+            >
+              <Checkmark />
+            </RoundedIcon>
+          </div>
+          <RoundedIcon onClick={discardChanges} tooltipText="Discard">
+            <Close />
           </RoundedIcon>
         </div>
       )}
