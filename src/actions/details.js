@@ -45,6 +45,11 @@ import {
 import { generatePods } from '../utils/generatePods'
 
 const detailsActions = {
+  fetchDetailsJobPods: (project, uid, kind) => () => {
+    return detailsApi
+        .getJobPods(project, uid, kind)
+        .then(({ data }) => generatePods(project, uid, data))
+  },
   fetchModelFeatureVector: (project, name, reference) => dispatch => {
     dispatch(detailsActions.fetchModelFeatureVectorBegin())
 

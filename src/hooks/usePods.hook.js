@@ -54,3 +54,53 @@ export const usePods = (dispatch, fetchJobPods, removePods, selectedJob) => {
     }
   }, [dispatch, fetchJobPods, params.projectName, removePods, selectedJob])
 }
+
+export const useDetailsPods = (dispatch, fetchJobPods, selectedJob, setSelectedJob) => {
+  const params = useParams()
+
+  useEffect(() => {
+    if (!isEmpty(selectedJob) && !arePodsHidden(selectedJob?.labels) && !selectedJob.podsData) {
+      dispatch(
+        fetchJobPods(
+          params.projectName || selectedJob?.project,
+          selectedJob.uid,
+          get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
+        )
+      ).then(data => {
+        setSelectedJob(prevState => {
+          return {
+            ...prevState,
+            ui: {
+              ...prevState.ui,
+              podsData: data
+            }
+          }
+        })
+      })
+
+      const interval = setInterval(() => {
+        dispatch(
+          fetchJobPods(
+            params.projectName || selectedJob?.project,
+            selectedJob.uid,
+            get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
+          )
+        ).then(data => {
+          setSelectedJob(prevState => {
+            return {
+              ...prevState,
+              ui: {
+                ...prevState.ui,
+                podsData: data
+              }
+            }
+          })
+        })
+      }, 30000)
+
+      return () => {
+        clearInterval(interval)
+      }
+    }
+  }, [dispatch, fetchJobPods, params.projectName, selectedJob, setSelectedJob])
+}
