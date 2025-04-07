@@ -29,16 +29,14 @@ import NoMetricData from '../DetailsMetrics/MetricsCards/NoMetricData'
 import StatsCard from '../../common/StatsCard/StatsCard'
 
 import { REQUEST_CANCELED } from '../../constants'
-import detailsActions from '../../actions/details'
-import modelEndpointsActions from '../../actions/modelEndpoints'
 import { groupMetricByApplication } from '../../elements/MetricsSelector/metricsSelector.util'
-
 import {
   CUSTOM_RANGE_DATE_OPTION,
   datePickerPastOptions,
   PAST_24_HOUR_DATE_OPTION,
   TIME_FRAME_LIMITS
 } from '../../utils/datePicker.util'
+import { fetchModelEndpointMetricsValues, setDetailsDates } from '../../reducers/detailsReducer'
 
 import { ReactComponent as MetricsIcon } from 'igz-controls/images/metrics-icon.svg'
 
@@ -65,7 +63,7 @@ const DetailsAlertsMetrics = ({ selectedItem, filters, isAlertsPage = true }) =>
       }
 
       dispatch(
-        detailsActions.setDetailsDates({
+        setDetailsDates({
           value: generatedDates,
           selectedOptionId,
           isPredefined
@@ -88,13 +86,13 @@ const DetailsAlertsMetrics = ({ selectedItem, filters, isAlertsPage = true }) =>
       metricsValuesAbortController.current = new AbortController()
 
       return dispatch(
-        modelEndpointsActions.fetchModelEndpointMetricsValues(
-          projectName,
+        fetchModelEndpointMetricsValues({
+          project: projectName,
           uid,
           params,
-          metricsValuesAbortController.current,
+          abortController: metricsValuesAbortController.current,
           setRequestErrorMessage
-        )
+        })
       )
     },
     [dispatch, metricsValuesAbortController]
@@ -148,9 +146,9 @@ const DetailsAlertsMetrics = ({ selectedItem, filters, isAlertsPage = true }) =>
   }, [fetchMetrics, setMetrics])
 
   return (
-    <div className="item-info__details-metrics">
+    <div className="metrics-wrapper">
       {isAlertsPage && detailsStore.loadingCounter === 0 && (
-        <div className="metrics__custom-filters">
+        <div className="metrics-wrapper__custom-filters">
           <DatePicker
             className="details-date-picker"
             date={detailsStore.dates.value[0]}
@@ -180,7 +178,7 @@ const DetailsAlertsMetrics = ({ selectedItem, filters, isAlertsPage = true }) =>
         <div ref={metricsContainerRef} className="metrics alerts-table__metrics">
           {generatedMetrics.map(([applicationName, applicationMetrics]) => (
             <React.Fragment key={applicationName}>
-              {isAlertsPage && <div className="metrics__app-name">{applicationName}</div>}
+              {isAlertsPage && <div className="metrics__card-header">{applicationName}</div>}
               {applicationMetrics.map(metric =>
                 !metric.data || isEmpty(metric.points) ? (
                   <NoMetricData key={metric.id} title={metric.title} />

@@ -95,7 +95,8 @@ const Documents = ({ isAllVersions = false }) => {
     paginationConfigDocumentVersionsRef,
     historyBackLink,
     'artifacts',
-    params.id && getCloseDetailsLink(isAllVersions ? ALL_VERSIONS_PATH : DOCUMENTS_TAB, true)
+    params.id && getCloseDetailsLink(isAllVersions ? ALL_VERSIONS_PATH : DOCUMENTS_TAB, true),
+    isAllVersions
   )
 
   const detailsFormInitialValues = useMemo(
@@ -215,10 +216,6 @@ const Documents = ({ isAllVersions = false }) => {
     },
     [fetchData, fetchTags]
   )
-
-  const handleRefreshWithFilters = useCallback(() => {
-    refreshDocuments(documentsFilters)
-  }, [documentsFilters, refreshDocuments])
 
   const handleAddTag = useCallback(
     artifact => {
@@ -439,7 +436,6 @@ const Documents = ({ isAllVersions = false }) => {
       handleRefreshDocuments={
         isAllVersions ? handleRefreshDocumentVersions : handleRefreshDocuments
       }
-      handleRefreshWithFilters={handleRefreshWithFilters}
       historyBackLink={historyBackLink}
       isAllVersions={isAllVersions}
       isSelectedArtifactBeyondTheList={isSelectedArtifactBeyondTheList}

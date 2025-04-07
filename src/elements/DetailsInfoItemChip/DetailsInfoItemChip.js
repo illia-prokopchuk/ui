@@ -30,7 +30,7 @@ import {
   getInternalLabelsValidationRule
 } from 'igz-controls/utils/validation.util'
 import { detailsInfoActions } from '../../components/DetailsInfo/detailsInfoReducer'
-import detailsActions from '../../actions/details'
+import { setEditMode } from '../../reducers/detailsReducer'
 
 import { ReactComponent as Close } from 'igz-controls/images/close.svg'
 import { ReactComponent as Checkmark } from 'igz-controls/images/checkmark2.svg'
@@ -55,7 +55,7 @@ const DetailsInfoItemChip = ({
     editableFieldType && editableFieldType !== 'chips' && 'details-item_disabled'
   )
 
-  const setEditMode = useCallback(() => {
+  const handleSetEditMode = useCallback(() => {
     if (
       !formState.form.getFieldState(item.fieldData.name).pristine &&
       !isFieldInEditMode &&
@@ -71,7 +71,7 @@ const DetailsInfoItemChip = ({
           fieldType: item?.editModeType
         }
       })
-      dispatch(detailsActions.setEditMode(true))
+      dispatch(setEditMode(true))
     } else if (formState.form.getFieldState(item.fieldData.name).pristine && !isFieldInEditMode) {
       handleFinishEdit(item.fieldData.name)
     }
@@ -105,7 +105,7 @@ const DetailsInfoItemChip = ({
           fieldType: item?.editModeType
         }
       })
-      dispatch(detailsActions.setEditMode(true))
+      dispatch(setEditMode(true))
     } else if (
       !isEmpty(formState.initialValues[item.fieldData.name]) &&
       isEmpty(formState.values[item.fieldData.name]) &&
@@ -119,7 +119,7 @@ const DetailsInfoItemChip = ({
           fieldType: item?.editModeType
         }
       })
-      dispatch(detailsActions.setEditMode(true))
+      dispatch(setEditMode(true))
     }
   }, [
     currentField,
@@ -131,8 +131,7 @@ const DetailsInfoItemChip = ({
     formState.values,
     isFieldInEditMode,
     item?.editModeType,
-    item.fieldData.name,
-    setEditMode
+    item.fieldData.name
   ])
 
   const validationRules = useMemo(() => {
@@ -155,7 +154,7 @@ const DetailsInfoItemChip = ({
       detailsStore.changes.data[item.fieldData.name]?.currentFieldValue ??
         formState.initialValues[item.fieldData.name]
     )
-    dispatch(detailsActions.setEditMode(false))
+    dispatch(setEditMode(false))
     detailsInfoDispatch({
       type: detailsInfoActions.RESET_EDIT_MODE
     })
@@ -173,7 +172,7 @@ const DetailsInfoItemChip = ({
         visibleChipsMaxLength="all"
         validationRules={validationRules}
       />
-      <FormOnChange name={item.fieldData.name} handler={setEditMode} />
+      <FormOnChange name={item.fieldData.name} handler={handleSetEditMode} />
       {isFieldInEditMode && (
         <div className="details-item__buttons-block">
           <div className="details-item__apply-btn-wrapper">

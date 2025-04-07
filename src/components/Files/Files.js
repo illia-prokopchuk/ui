@@ -95,7 +95,8 @@ const Files = ({ isAllVersions = false }) => {
     paginationConfigFileVersionsRef,
     historyBackLink,
     'artifacts',
-    params.id && getCloseDetailsLink(isAllVersions ? ALL_VERSIONS_PATH : FILES_TAB, true)
+    params.id && getCloseDetailsLink(isAllVersions ? ALL_VERSIONS_PATH : FILES_TAB, true),
+    isAllVersions
   )
 
   const pageData = useMemo(() => generatePageData(viewMode), [viewMode])
@@ -218,10 +219,6 @@ const Files = ({ isAllVersions = false }) => {
     },
     [fetchData, fetchTags]
   )
-
-  const handleRefreshWithFilters = useCallback(() => {
-    refreshFiles(filesFilters)
-  }, [filesFilters, refreshFiles])
 
   const handleAddTag = useCallback(
     artifact => {
@@ -444,7 +441,6 @@ const Files = ({ isAllVersions = false }) => {
       filtersStore={filtersStore}
       getAndSetSelectedArtifact={getAndSetSelectedArtifact}
       handleRefreshFiles={isAllVersions ? handleRefreshFileVersions : handleRefreshFiles}
-      handleRefreshWithFilters={handleRefreshWithFilters}
       handleRegisterArtifact={handleRegisterArtifact}
       historyBackLink={historyBackLink}
       isAllVersions={isAllVersions}

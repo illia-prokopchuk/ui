@@ -37,7 +37,6 @@ import {
   handleDeleteJob,
   isJobKindLocal
 } from '../../components/Jobs/jobs.util'
-import detailsActions from '../../actions/details'
 import getState from '../../utils/getState'
 import { DANGER_BUTTON } from 'igz-controls/constants'
 import { FILTERS_CONFIG } from '../../types'
@@ -51,6 +50,7 @@ import { openPopUp } from 'igz-controls/utils/common.util'
 import { setNotification } from '../../reducers/notificationReducer'
 import { toggleYaml } from '../../reducers/appReducer'
 import { usePods } from '../../hooks/usePods.hook'
+import { getInitialFiltersByConfig } from '../../hooks/useFiltersFromSearchParams.hook'
 
 const JobsTable = React.forwardRef(
   (
@@ -97,7 +97,7 @@ const JobsTable = React.forwardRef(
       setJobWizardMode
     } = React.useContext(context)
 
-    usePods(dispatch, detailsActions.fetchJobPods, detailsActions.removePods, selectedJob)
+    usePods(dispatch, selectedJob)
 
     const toggleConvertedYaml = useCallback(
       data => {
@@ -112,10 +112,6 @@ const JobsTable = React.forwardRef(
       },
       [dispatch]
     )
-
-    const handleRefreshWithFilters = useCallback(() => {
-      refreshJobs(filters)
-    }, [filters, refreshJobs])
 
     const pageData = useMemo(
       () => generatePageData(handleFetchJobLogs, selectedJob),
@@ -284,6 +280,11 @@ const JobsTable = React.forwardRef(
       params.jobName
     ])
 
+    const refreshJobsWithFilters = useCallback((useInitialFilter) => {
+      const initialJobFilters = getInitialFiltersByConfig(filtersConfig)
+      refreshJobs(useInitialFilter ? initialJobFilters : filters, { forceFetchJobs: true })
+    }, [filters, refreshJobs, filtersConfig])
+
     useEffect(() => {
       if (
         jobWizardMode &&
@@ -305,7 +306,7 @@ const JobsTable = React.forwardRef(
           defaultData: jobWizardMode === PANEL_RERUN_MODE ? editableItem?.rerun_object : {},
           mode: jobWizardMode,
           wizardTitle: jobWizardMode === PANEL_RERUN_MODE ? 'Batch re-run' : undefined,
-          onSuccessRequest: () => refreshJobs(filters)
+          onSuccessRequest: refreshJobsWithFilters
         })
 
         setJobWizardIsOpened(true)
@@ -316,7 +317,7 @@ const JobsTable = React.forwardRef(
       jobWizardMode,
       filters,
       params,
-      refreshJobs,
+      refreshJobsWithFilters,
       setEditableItem,
       setJobWizardIsOpened,
       setJobWizardMode
@@ -382,7 +383,6 @@ const JobsTable = React.forwardRef(
                 getCloseDetailsLink={() => getCloseDetailsLink(params.jobName)}
                 handleCancel={() => setSelectedJob({})}
                 pageData={pageData}
-                retryRequest={handleRefreshWithFilters}
                 selectedItem={selectedJob}
                 tab={MONITOR_JOBS_TAB}
                 tableClassName="monitor-jobs-table"
@@ -418,7 +418,11 @@ const JobsTable = React.forwardRef(
                       ? 'Close detailed view and uncheck Auto Refresh to view more results'
                       : ''
                 }
-                disableNextDoubleBtn={filtersStore.autoRefresh || autoRefreshPrevValue}
+                disableNextDoubleBtn={
+                  (filtersStore.autoRefresh && !params.jobName) ||
+                  (params.jobName && filtersStore.internalAutoRefresh) ||
+                  autoRefreshPrevValue
+                }
               />
             </>
           )

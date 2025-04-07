@@ -95,7 +95,8 @@ const Datasets = ({ isAllVersions = false }) => {
     paginationConfigDatasetVersionsRef,
     historyBackLink,
     'artifacts',
-    params.id && getCloseDetailsLink(isAllVersions ? ALL_VERSIONS_PATH : DATASETS_TAB, true)
+    params.id && getCloseDetailsLink(isAllVersions ? ALL_VERSIONS_PATH : DATASETS_TAB, true),
+    isAllVersions
   )
 
   const pageData = useMemo(
@@ -221,10 +222,6 @@ const Datasets = ({ isAllVersions = false }) => {
     },
     [fetchData, fetchTags]
   )
-
-  const handleRefreshWithFilters = useCallback(() => {
-    refreshDatasets(datasetsFilters)
-  }, [datasetsFilters, refreshDatasets])
 
   const handleAddTag = useCallback(
     artifact => {
@@ -446,7 +443,6 @@ const Datasets = ({ isAllVersions = false }) => {
       filtersStore={filtersStore}
       getAndSetSelectedArtifact={getAndSetSelectedArtifact}
       handleRefreshDatasets={isAllVersions ? handleRefreshDatasetVersions : handleRefreshDatasets}
-      handleRefreshWithFilters={handleRefreshWithFilters}
       handleRegisterDataset={handleRegisterDataset}
       historyBackLink={historyBackLink}
       isAllVersions={isAllVersions}

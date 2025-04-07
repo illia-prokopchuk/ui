@@ -34,10 +34,11 @@ import {
   V3IO_INPUT_PATH_SCHEME
 } from '../../constants'
 import { getArtifactReference, getFeatureReference, getParsedResource } from '../../utils/resources'
-import projectAction from '../../actions/projects'
 import { showErrorNotification } from '../../utils/notifications.util'
 import { fetchArtifact, fetchArtifacts } from '../../reducers/artifactsReducer'
 import { fetchFeatureVector, fetchFeatureVectors } from '../../reducers/featureStoreReducer'
+import { fetchProjectsNames } from '../../reducers/projectReducer'
+import { isCommunityEdition } from '../../utils/helper'
 
 const targetPathRegex =
   /^(store|v3io|s3|az|gs):(\/\/\/|\/\/)(?!.*:\/\/)([\w\-._~:?#[\]@!$&'()*+,;=]+)\/([\w\-._~:/?#[\]%@!$&'()*+,;=]+)$/i
@@ -174,7 +175,7 @@ export const getTargetPathOptions = hiddenOptionsIds => [
     className: 'path-type-v3io',
     label: 'V3IO',
     id: V3IO_INPUT_PATH_SCHEME,
-    hidden: hiddenOptionsIds?.includes(V3IO_INPUT_PATH_SCHEME)
+    hidden: isCommunityEdition() || hiddenOptionsIds?.includes(V3IO_INPUT_PATH_SCHEME)
   },
   {
     className: 'path-type-s3',
@@ -332,12 +333,15 @@ export const generateArtifactsReferencesList = artifacts => {
 }
 
 export const getProjectsNames = (dispatch, setDataInputState, projectName) => {
-  dispatch(projectAction.fetchProjectsNames()).then(result => {
-    setDataInputState(prev => ({
-      ...prev,
-      projects: generateProjectsList(result ?? [], projectName)
-    }))
-  })
+  dispatch(fetchProjectsNames())
+    .unwrap()
+    .then(result => {
+      setDataInputState(prev => ({
+        ...prev,
+        projects: generateProjectsList(result ?? [], projectName)
+      }))
+    })
+    .catch(() => {})
 }
 
 export const getArtifacts = (dispatch, project, storePathType, setDataInputState) => {

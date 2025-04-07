@@ -32,6 +32,8 @@ import {
   getFeatureVectorIdentifier
 } from '../utils/getUniqueIdentifier'
 import { parseFeatureVectors } from '../utils/parseFeatureVectors'
+import { isCommunityEdition } from '../utils/helper'
+import { REDISNOSQL } from '../components/FeatureSetsPanel/FeatureSetsPanelTargetStore/featureSetsPanelTargetStore.util'
 
 const initialState = {
   error: null,
@@ -95,7 +97,7 @@ const initialState = {
         },
         {
           name: 'nosql',
-          kind: 'nosql',
+          kind: isCommunityEdition() ? REDISNOSQL : 'nosql',
           online: true,
           path: ''
         }
@@ -538,18 +540,5 @@ export const {
   setNewFeatureSetTarget,
   setNewFeatureSetVersion
 } = featureStoreSlice.actions
-export default featureStoreSlice.reducer
 
-// const featureStoreReducer = (state = initialState, { type, payload }) => {
-//     case START_FEATURE_SET_INGEST_SUCCESS:
-//       return {
-//         ...state,
-//         loading: false,
-//         error: null
-//       }
-//     default:
-//       return state
-//   }
-// }
-//
-// export default featureStoreReducer
+export default featureStoreSlice.reducer
