@@ -23,27 +23,28 @@ import { useParams } from 'react-router-dom'
 
 import { arePodsHidden } from '../components/Jobs/jobs.util'
 import { JOB_KIND_JOB } from '../constants'
+import { fetchJobPods, fetchDetailsJobPods, removePods } from '../reducers/detailsReducer'
 
-export const usePods = (dispatch, fetchJobPods, removePods, selectedJob) => {
+export const usePods = (dispatch, selectedJob) => {
   const params = useParams()
 
   useEffect(() => {
     if (!isEmpty(selectedJob) && !arePodsHidden(selectedJob?.labels)) {
       dispatch(
-        fetchJobPods(
-          params.projectName || selectedJob?.project,
-          selectedJob.uid,
-          get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
-        )
+        fetchJobPods({
+          project: params.projectName || selectedJob?.project,
+          uid: selectedJob.uid,
+          kind: get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
+        })
       )
 
       const interval = setInterval(() => {
         dispatch(
-          fetchJobPods(
-            params.projectName || selectedJob?.project,
-            selectedJob.uid,
-            get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
-          )
+          fetchJobPods({
+            project: params.projectName || selectedJob?.project,
+            uid: selectedJob.uid,
+            kind: get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
+          })
         )
       }, 30000)
 
@@ -52,16 +53,16 @@ export const usePods = (dispatch, fetchJobPods, removePods, selectedJob) => {
         clearInterval(interval)
       }
     }
-  }, [dispatch, fetchJobPods, params.projectName, removePods, selectedJob])
+  }, [dispatch, params.projectName, selectedJob])
 }
 
-export const useDetailsPods = (dispatch, fetchJobPods, selectedJob, setSelectedJob) => {
+export const useDetailsPods = (dispatch, selectedJob, setSelectedJob) => {
   const params = useParams()
 
   useEffect(() => {
     if (!isEmpty(selectedJob) && !arePodsHidden(selectedJob?.labels) && !selectedJob.podsData) {
       dispatch(
-        fetchJobPods(
+        fetchDetailsJobPods(
           params.projectName || selectedJob?.project,
           selectedJob.uid,
           get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
@@ -80,7 +81,7 @@ export const useDetailsPods = (dispatch, fetchJobPods, selectedJob, setSelectedJ
 
       const interval = setInterval(() => {
         dispatch(
-          fetchJobPods(
+          fetchDetailsJobPods(
             params.projectName || selectedJob?.project,
             selectedJob.uid,
             get(selectedJob, 'ui.originalContent.metadata.labels.kind', JOB_KIND_JOB)
@@ -102,5 +103,5 @@ export const useDetailsPods = (dispatch, fetchJobPods, selectedJob, setSelectedJ
         clearInterval(interval)
       }
     }
-  }, [dispatch, fetchJobPods, params.projectName, selectedJob, setSelectedJob])
+  }, [dispatch, params.projectName, selectedJob, setSelectedJob])
 }
