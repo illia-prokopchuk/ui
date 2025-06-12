@@ -302,9 +302,9 @@ const Details = ({
 
     if (detailsStore.filtersWasHandled) {
       dispatch(setFiltersWasHandled(false))
-    } else {
-      blocker.proceed?.()
     }
+
+    blocker.proceed?.()
 
     window.dispatchEvent(new CustomEvent('discardChanges'))
   }, [blocker, cancelChanges, detailsStore.filtersWasHandled, dispatch, handleShowWarning])

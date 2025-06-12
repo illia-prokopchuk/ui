@@ -44,6 +44,7 @@ import {
 } from '../../../utils/link-helper.util'
 import { getFilteredSearchParams } from '../../../utils/filter.util'
 import { setIteration } from '../../../reducers/detailsReducer'
+import { performDetailsActionHelper } from '../details.util'
 
 import Close from 'igz-controls/images/close.svg?react'
 import Back from 'igz-controls/images/back-arrow.svg?react'
@@ -105,6 +106,14 @@ const DetailsHeader = ({
       handleCancel()
     }
   }, [detailsStore.changes.counter, handleCancel, handleShowWarning])
+
+  const handleActionClick = async handler => {
+    const actionCanBePerformed = await performDetailsActionHelper(detailsStore.changes, dispatch)
+
+    if (actionCanBePerformed) {
+      handler(params, handleRefresh)
+    }
+  }
 
   const handleCancelClick = useCallback(() => {
     if (detailsStore.changes.counter === 0 || isDetailsPopUp) {
@@ -254,7 +263,9 @@ const DetailsHeader = ({
           <Button
             disabled={actionButton.disabled}
             label={actionButton.label}
-            onClick={actionButton.onClick}
+            onClick={() => {
+              handleActionClick(actionButton.onClick)
+            }}
             tooltip={actionButton.tooltip}
             variant={actionButton.variant}
           />
