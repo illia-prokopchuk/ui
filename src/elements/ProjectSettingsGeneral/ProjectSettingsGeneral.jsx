@@ -55,8 +55,7 @@ import {
   areFormValuesChanged,
   generateObjectFromKeyValue,
   parseObjectToKeyValue,
-  setFieldState,
-  clearObjectFromEmptyArrayElements
+  setFieldState
 } from 'igz-controls/utils/form.util'
 import { FORBIDDEN_ERROR_STATUS_CODE } from 'igz-controls/constants'
 import { getChipOptions } from 'igz-controls/utils/chips.util'
@@ -200,10 +199,7 @@ const ProjectSettingsGeneral = ({
 
       if (
         !isEmpty(lastEditedProjectValues) &&
-        areFormValuesChanged(
-          lastEditedProjectValues,
-          clearObjectFromEmptyArrayElements(formStateLocal.values)
-        ) &&
+        areFormValuesChanged(lastEditedProjectValues, formStateLocal.values) &&
         formStateLocal.valid
       ) {
         let newProjectData = cloneDeep(projectStore.project.data)
